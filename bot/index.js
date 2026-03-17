@@ -19,7 +19,7 @@ bot.on('polling_error', (err) => {
     console.error('Polling xato:', err.message);
   }
 });
-const MINIAPP_URL = process.env.MINIAPP_URL || 'http://localhost:3000';
+const MINIAPP_URL = process.env.MINIAPP_URL || 'http://localhost:8080';
 
 // ─── /start ──────────────────────────────────────────────────
 bot.onText(/\/start/, async (msg) => {
