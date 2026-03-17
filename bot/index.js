@@ -2,7 +2,23 @@ require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const { userDB, postDB, getMahallaId } = require('../server/db');
 
-const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+const bot = new TelegramBot(process.env.BOT_TOKEN, {
+  polling: {
+    interval: 1000,
+    autoStart: true,
+    params: { timeout: 10 }
+  }
+});
+
+// 409 Conflict — boshqa instance ishlayotgan bo'lsa, kutib qayta ulanadi
+bot.on('polling_error', (err) => {
+  if (err.code === 'ETELEGRAM' && err.message && err.message.includes('409')) {
+    console.log('409 Conflict — 5s kutilmoqda...');
+    bot.stopPolling().then(() => setTimeout(() => bot.startPolling(), 5000));
+  } else {
+    console.error('Polling xato:', err.message);
+  }
+});
 const MINIAPP_URL = process.env.MINIAPP_URL || 'http://localhost:3000';
 
 // ─── /start ──────────────────────────────────────────────────
