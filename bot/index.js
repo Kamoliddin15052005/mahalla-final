@@ -19,7 +19,12 @@ bot.on('polling_error', (err) => {
     console.error('Polling xato:', err.message);
   }
 });
-const MINIAPP_URL = process.env.MINIAPP_URL || 'http://localhost:3000';
+const BASE_URL = process.env.MINIAPP_URL || 'http://localhost:3000';
+
+// Mini App URL ga chat_id ni qo'shamiz — Mini App uni URL dan oladi
+function getMiniAppUrl(chatId) {
+  return `${BASE_URL}?uid=${chatId}`;
+}
 
 // ─── /start ──────────────────────────────────────────────────
 bot.onText(/\/start/, async (msg) => {
@@ -212,7 +217,7 @@ async function sendMainMenu(chatId, user) {
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [
-          [{ text: '🗺️ Mini Appni ochish', web_app: { url: MINIAPP_URL } }],
+          [{ text: '🗺️ Mini Appni ochish', web_app: { url: getMiniAppUrl(chatId) } }],
           [
             { text: '📊 Mening ballarim', callback_data: 'score' },
             { text: '👥 A\'zolar', callback_data: 'members' }
