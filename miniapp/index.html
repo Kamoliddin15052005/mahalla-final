@@ -559,7 +559,11 @@ function showRegBanner(){
   const b=document.createElement('div');
   b.id='reg-banner';
   b.style.cssText='position:fixed;top:58px;left:0;right:0;background:#FEF3C7;border-bottom:2px solid #FCD34D;padding:10px 16px;display:flex;align-items:center;gap:10px;z-index:200;font-size:13px;font-weight:600;color:#92400E';
-  b.innerHTML="<span>⚠️</span><span style='flex:1'>Avval botda ro'yxatdan o'ting!</span><button onclick="window.Telegram?.WebApp?.close()" style='background:#F59E0B;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer'>Botga qaytish</button>";
+  b.innerHTML = `
+    <span>⚠️</span>
+    <span style="flex:1">Avval botda ro'yxatdan o'ting!</span>
+    <button onclick="window.Telegram?.WebApp?.close()" style="background:#F59E0B;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">Botga qaytish</button>
+  `;
   document.body.appendChild(b);
 }
 
