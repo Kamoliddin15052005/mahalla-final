@@ -474,36 +474,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 const tg = window.Telegram?.WebApp;
 if(tg){ tg.expand(); tg.ready(); }
 
-// CHAT_ID ni 3 usulda olish
+// CHAT_ID olish — 4 usulda
 let CHAT_ID = null;
 try {
-  // 1-usul: URL parametridan (bot tomonidan yuboriladi)
+  // 1: URL ?start= parametri (bot yuboradi)
   const urlParams = new URLSearchParams(window.location.search);
-  const uidFromUrl = urlParams.get('uid') || urlParams.get('tgWebAppStartParam');
-  if(uidFromUrl && /^\d+$/.test(uidFromUrl)) {
-    CHAT_ID = uidFromUrl;
+  const fromUrl = urlParams.get('start');
+  if (fromUrl && /^\d+$/.test(fromUrl)) {
+    CHAT_ID = fromUrl;
+    console.log('CHAT_ID URL dan:', CHAT_ID);
   }
 
-  // 2-usul: tg.initDataUnsafe
-  if(!CHAT_ID) {
+  // 2: tg.initDataUnsafe
+  if (!CHAT_ID) {
     const uid = tg?.initDataUnsafe?.user?.id;
-    if(uid) CHAT_ID = String(uid);
+    if (uid) { CHAT_ID = String(uid); console.log('CHAT_ID initDataUnsafe dan:', CHAT_ID); }
   }
 
-  // 3-usul: initData ni parse qilish
-  if(!CHAT_ID && tg?.initData) {
-    const params = new URLSearchParams(tg.initData);
-    const user = JSON.parse(params.get('user') || '{}');
-    if(user.id) CHAT_ID = String(user.id);
+  // 3: initData parse
+  if (!CHAT_ID && tg?.initData) {
+    const p = new URLSearchParams(tg.initData);
+    const u = JSON.parse(p.get('user') || '{}');
+    if (u.id) { CHAT_ID = String(u.id); console.log('CHAT_ID initData dan:', CHAT_ID); }
+  }
+
+  // 4: start_param
+  if (!CHAT_ID) {
+    const sp = tg?.initDataUnsafe?.start_param;
+    if (sp && /^\d+$/.test(sp)) { CHAT_ID = sp; console.log('CHAT_ID start_param dan:', CHAT_ID); }
   }
 } catch(e) { console.warn('CHAT_ID xato:', e); }
 
-const TGU = tg?.initDataUnsafe?.user || {};
-const API = '';
-
-console.log('CHAT_ID:', CHAT_ID, '| URL:', window.location.search);
-
-let myLat=null, myLng=null, myUser=null;
+console.log('FINAL CHAT_ID:', CHAT_ID, 'URL:', window.location.href);ser=null;
 let myMap=null, postType='muammo', photoFile=null;
 let curTab='map', chatMode='group', chatContactId=null;
 let chatPoll=null, allPosts=[], activeFilter='all';
