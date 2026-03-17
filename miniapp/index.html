@@ -1,972 +1,1986 @@
 <!DOCTYPE html>
 <html lang="uz">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Mahalla Bot</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#F0F4F8;
-  --white:#ffffff;
-  --card:#ffffff;
-  --blue:#4F6EF7;
-  --blue2:#3B5BDB;
-  --green:#22C55E;
-  --red:#EF4444;
-  --orange:#F97316;
-  --purple:#8B5CF6;
-  --teal:#14B8A6;
-  --gray:#94A3B8;
-  --text:#1E293B;
-  --text2:#64748B;
-  --border:#E2E8F0;
-  --nav-h:68px;
-  --hdr-h:58px;
-}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mahalla Bot</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent
+    }
 
-/* ── LOADING ── */
-#loading{position:fixed;inset:0;background:linear-gradient(135deg,#4F6EF7,#8B5CF6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:9999}
-#loading .spin{width:40px;height:40px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#loading p{color:rgba(255,255,255,.8);font-size:13px}
+    :root {
+      --bg: #F0F4F8;
+      --white: #ffffff;
+      --card: #ffffff;
+      --blue: #4F6EF7;
+      --blue2: #3B5BDB;
+      --green: #22C55E;
+      --red: #EF4444;
+      --orange: #F97316;
+      --purple: #8B5CF6;
+      --teal: #14B8A6;
+      --gray: #94A3B8;
+      --text: #1E293B;
+      --text2: #64748B;
+      --border: #E2E8F0;
+      --nav-h: 68px;
+      --hdr-h: 58px;
+    }
 
-/* ── TOAST ── */
-.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-6px);background:#1E293B;color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;transition:all .25s;z-index:9998;white-space:nowrap}
-.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden
+    }
 
-/* ── HEADER ── */
-.hdr{height:var(--hdr-h);background:var(--white);display:flex;align-items:center;padding:0 16px;gap:10px;border-bottom:1px solid var(--border);position:relative;z-index:50}
-.hdr-logo{width:36px;height:36px;background:linear-gradient(135deg,#4F6EF7,#8B5CF6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.hdr-info{flex:1;min-width:0}
-.hdr-name{font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hdr-sub{font-size:11px;color:var(--text2)}
-.hdr-pill{background:#FEE2E2;color:var(--red);font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;flex-shrink:0}
+    /* ── LOADING ── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #4F6EF7, #8B5CF6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      z-index: 9999
+    }
 
-/* ── TABS ── */
-.tab{display:none;flex-direction:column;height:calc(100vh - var(--hdr-h) - var(--nav-h));overflow:hidden}
-.tab.on{display:flex}
+    #loading .spin {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, .3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite
+    }
 
-/* ── BOTTOM NAV ── */
-.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--white);border-top:1px solid var(--border);display:flex;align-items:center;z-index:100;padding:0 8px;padding-bottom:env(safe-area-inset-bottom)}
-.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:none;border:none;cursor:pointer;color:var(--gray);padding:8px 4px;border-radius:12px;transition:all .2s;position:relative}
-.nbtn .ni{font-size:22px;transition:transform .2s}
-.nbtn .nl{font-size:10px;font-weight:600}
-.nbtn.on{color:var(--blue)}
-.nbtn.on .ni{transform:scale(1.15)}
-/* Signal tugmasi alohida */
-.nbtn.signal-center{background:linear-gradient(135deg,#4F6EF7,#8B5CF6);color:#fff;border-radius:20px;padding:10px 20px;margin:0 4px;box-shadow:0 4px 14px rgba(79,110,247,.45)}
-.nbtn.signal-center.on{color:#fff}
-.nbtn.signal-center .ni{font-size:24px}
-@keyframes pulse{0%,100%{box-shadow:0 4px 14px rgba(79,110,247,.45)}50%{box-shadow:0 4px 22px rgba(79,110,247,.75)}}
-.nbtn.signal-center{animation:pulse 2s ease-in-out infinite}
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
 
-/* ══════════ MAP TAB ══════════ */
-#tab-map{position:relative}
-#ymap{flex:1;width:100%}
-.map-fab{position:absolute;right:14px;bottom:14px;background:var(--white);border:none;border-radius:50%;width:44px;height:44px;font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;justify-content:center}
+    #loading p {
+      color: rgba(255, 255, 255, .8);
+      font-size: 13px
+    }
 
-/* ══════════ SIGNAL TAB ══════════ */
-#tab-signal{overflow-y:auto;background:var(--bg)}
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      background: #1E293B;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .25s;
+      z-index: 9998;
+      white-space: nowrap
+    }
 
-/* Signal form card */
-.signal-hero{background:linear-gradient(135deg,#4F6EF7 0%,#8B5CF6 100%);margin:12px;border-radius:18px;padding:16px;color:#fff;display:flex;align-items:flex-start;gap:12px}
-.signal-hero-icon{width:44px;height:44px;background:rgba(255,255,255,.2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.signal-hero-title{font-size:15px;font-weight:700;margin-bottom:4px}
-.signal-hero-sub{font-size:12px;opacity:.85;line-height:1.5}
+    .toast.on {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
 
-.sig-section{margin:0 12px 10px;background:var(--white);border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.sig-section-hdr{padding:12px 14px 4px;display:flex;align-items:center;gap:8px}
-.sig-section-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.si-green{background:#D1FAE5}
-.si-blue{background:#DBEAFE}
-.si-purple{background:#EDE9FE}
-.sig-section-title{font-size:13px;font-weight:700;color:var(--text)}
-.sig-section-sub{font-size:11px;color:var(--text2);margin-left:auto}
+    /* ── HEADER ── */
+    .hdr {
+      height: var(--hdr-h);
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      z-index: 50
+    }
 
-/* GPS row */
-.gps-row{margin:4px 14px 12px;background:var(--bg);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;cursor:pointer}
-.gps-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.gps-dot.wait{background:#FCD34D}
-.gps-dot.ok{background:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,.2)}
-.gps-dot.err{background:var(--red)}
-.gps-txt{font-size:13px;font-weight:500;flex:1}
-.gps-sub{font-size:11px;color:var(--text2)}
+    .hdr-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #4F6EF7, #8B5CF6);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0
+    }
 
-/* Rasm tugmalari */
-.photo-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 14px 12px}
-.photo-btn{border:1.5px dashed var(--border);background:var(--bg);border-radius:12px;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--text2);font-weight:500}
-.photo-btn:active{background:var(--border)}
-.photo-btn .pb-icon{font-size:28px}
-.preview-img-wrap{margin:4px 14px 12px;border-radius:12px;overflow:hidden;position:relative}
-.preview-img-wrap img{width:100%;max-height:180px;object-fit:cover;display:block}
-.rm-photo{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .hdr-info {
+      flex: 1;
+      min-width: 0
+    }
 
-/* Textarea */
-.sig-textarea{width:100%;border:none;outline:none;font-family:inherit;font-size:14px;color:var(--text);background:transparent;padding:4px 14px 14px;resize:none;line-height:1.6}
-.sig-textarea::placeholder{color:var(--gray)}
+    .hdr-name {
+      font-size: 15px;
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
 
-/* Kategoriyalar */
-.cats{display:flex;flex-wrap:wrap;gap:8px;padding:8px 14px 14px}
-.cat-btn{border:1.5px solid var(--border);background:var(--white);border-radius:24px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);transition:all .15s;display:flex;align-items:center;gap:5px}
-.cat-btn.sel{background:var(--blue);border-color:var(--blue);color:#fff}
-.cat-btn .cb-dot{width:7px;height:7px;border-radius:50%}
+    .hdr-sub {
+      font-size: 11px;
+      color: var(--text2)
+    }
 
-/* Ta'sir ko'rsatgich */
-.impact-row{margin:0 12px 10px;background:var(--white);border-radius:16px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
-.impact-label{font-size:12px;color:var(--text2)}
-.impact-val{font-size:13px;font-weight:700;color:var(--orange)}
-.impact-hint{font-size:11px;color:var(--text2)}
+    .hdr-pill {
+      background: #FEE2E2;
+      color: var(--red);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      flex-shrink: 0
+    }
 
-/* Submit tugma */
-.submit-wrap{padding:4px 12px 12px}
-.btn-submit{width:100%;background:linear-gradient(90deg,#4F6EF7,#8B5CF6);color:#fff;border:none;border-radius:16px;padding:16px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.3px}
-.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+    /* ── TABS ── */
+    .tab {
+      display: none;
+      flex-direction: column;
+      height: calc(100vh - var(--hdr-h) - var(--nav-h));
+      overflow: hidden
+    }
 
-/* ══════════ LENTA TAB ══════════ */
-#tab-lenta{overflow-y:auto;background:var(--bg)}
-.lenta-hdr{padding:14px 14px 8px;display:flex;align-items:center;justify-content:space-between}
-.lenta-title{font-size:17px;font-weight:800}
-.filter-row{display:flex;gap:6px;padding:0 12px 10px;overflow-x:auto}
-.filter-row::-webkit-scrollbar{display:none}
-.f-btn{border:1.5px solid var(--border);background:var(--white);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);white-space:nowrap;flex-shrink:0}
-.f-btn.on{background:var(--blue);border-color:var(--blue);color:#fff}
-.post-card{background:var(--white);margin:0 12px 10px;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.post-cat-bar{height:4px}
-.post-body{padding:12px 14px 8px}
-.post-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:8px}
-.badge-muammo{background:#FEE2E2;color:#DC2626}
-.badge-narkotik{background:#F3F4F6;color:#374151}
-.badge-jinoyat{background:#FEF3C7;color:#92400E}
-.badge-axlat{background:#D1FAE5;color:#065F46}
-.badge-kasal{background:#DBEAFE;color:#1D4ED8}
-.badge-boshqa{background:#EDE9FE;color:#5B21B6}
-.post-desc{font-size:14px;color:var(--text);line-height:1.6;margin-bottom:8px}
-.post-img-thumb{width:100%;max-height:200px;object-fit:cover;display:block;border-radius:10px;margin-bottom:8px}
-.post-footer{display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px solid var(--border)}
-.post-author{font-size:12px;color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.post-role{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0}
-.pr-rais{background:#DBEAFE;color:#1D4ED8}
-.pr-inspektor{background:#EDE9FE;color:#5B21B6}
-.pr-aholi{background:#F1F5F9;color:#64748B}
-.btn-like{background:none;border:none;cursor:pointer;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px}
-.btn-like.liked{color:var(--red)}
-.btn-hal{background:#D1FAE5;color:#065F46;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0}
-.resolved-badge{font-size:11px;color:var(--green);font-weight:700}
-.empty{text-align:center;padding:60px 20px;color:var(--text2)}
-.empty-icon{font-size:42px;margin-bottom:10px}
+    .tab.on {
+      display: flex
+    }
 
-/* ══════════ CHAT TAB ══════════ */
-#tab-chat{overflow:hidden}
-.chat-views{display:flex;flex-direction:column;height:100%}
-.chat-list-wrap{display:flex;flex-direction:column;height:100%}
-.chat-list-wrap.hide{display:none}
-.chat-list-hdr{padding:14px 14px 10px;font-size:17px;font-weight:800;background:var(--white);border-bottom:1px solid var(--border)}
-.chat-list-body{overflow-y:auto;flex:1}
-.chat-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;background:var(--white);transition:background .1s}
-.chat-item:active{background:var(--bg)}
-.chat-av{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0}
-.ca-group{background:linear-gradient(135deg,#DBEAFE,#EDE9FE);color:var(--blue)}
-.ca-user{background:#D1FAE5;color:var(--teal)}
-.chat-meta{flex:1;min-width:0}
-.chat-name2{font-size:14px;font-weight:700;margin-bottom:2px}
-.chat-last2{font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chat-time2{font-size:11px;color:var(--text2);flex-shrink:0}
+    /* ── BOTTOM NAV ── */
+    .bnav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: var(--nav-h);
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      z-index: 100;
+      padding: 0 8px;
+      padding-bottom: env(safe-area-inset-bottom)
+    }
 
-/* Chat room */
-.chat-room-wrap{display:none;flex-direction:column;height:100%}
-.chat-room-wrap.on{display:flex}
-.chat-room-hdr{padding:10px 14px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
-.back-btn{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:0 6px 0 0}
-.room-name{font-size:15px;font-weight:700;flex:1}
-.room-sub{font-size:11px;color:var(--text2)}
-.msgs-wrap{flex:1;overflow-y:auto;padding:12px 12px 6px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
-.msg-b{max-width:80%;padding:9px 13px;border-radius:16px;font-size:13px;line-height:1.5;word-break:break-word}
-.msg-out{align-self:flex-end;background:linear-gradient(135deg,#4F6EF7,#8B5CF6);color:#fff;border-bottom-right-radius:4px}
-.msg-in{align-self:flex-start;background:var(--white);color:var(--text);border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
-.msg-sndr{font-size:10px;font-weight:700;margin-bottom:3px;opacity:.7}
-.msg-t{font-size:10px;margin-top:3px;opacity:.6;text-align:right}
-.msg-input-bar{padding:8px 12px;background:var(--white);border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
-.msg-input{flex:1;border:1.5px solid var(--border);border-radius:24px;padding:10px 16px;font-size:14px;font-family:inherit;outline:none;background:var(--bg)}
-.msg-input:focus{border-color:var(--blue);background:var(--white)}
-.send-btn{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#4F6EF7,#8B5CF6);border:none;color:#fff;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .nbtn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--gray);
+      padding: 8px 4px;
+      border-radius: 12px;
+      transition: all .2s;
+      position: relative
+    }
 
-/* ══════════ TAHLIL TAB ══════════ */
-#tab-tahlil{overflow-y:auto;padding:12px;gap:10px;display:none;flex-direction:column;background:var(--bg)}
-#tab-tahlil.on{display:flex}
-.tahlil-score{background:linear-gradient(135deg,#4F6EF7,#8B5CF6);border-radius:18px;padding:20px;color:#fff;display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
-.ts-left .ts-lbl{font-size:12px;opacity:.8;margin-bottom:4px}
-.ts-left .ts-num{font-size:42px;font-weight:900;line-height:1}
-.ts-left .ts-rank{font-size:12px;opacity:.75;margin-top:6px}
-.ts-icon{font-size:52px;opacity:.2}
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat-c{background:var(--white);border-radius:14px;padding:14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.stat-n{font-size:26px;font-weight:900}
-.stat-l{font-size:11px;color:var(--text2);margin-top:2px}
-.section-h{font-size:15px;font-weight:800;margin-bottom:8px;color:var(--text)}
-.lb-wrap{background:var(--white);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.lb-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--border)}
-.lb-item:last-child{border-bottom:none}
-.lb-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
-.lb-1{background:#FEF3C7;color:#D97706}
-.lb-2{background:#F1F5F9;color:#475569}
-.lb-3{background:#FEF0E7;color:#C2580A}
-.lb-n{background:var(--bg);color:var(--text2)}
-.lb-name2{flex:1;font-size:14px;font-weight:600}
-.lb-score2{font-size:14px;font-weight:800;color:var(--blue)}
-/* Kategoriya statistika */
-.cat-stats{background:var(--white);border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.cs-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.cs-row:last-child{margin-bottom:0}
-.cs-icon{font-size:16px;width:24px;text-align:center}
-.cs-label{font-size:13px;color:var(--text2);flex:1}
-.cs-bar-wrap{width:100px;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
-.cs-bar{height:100%;border-radius:3px;background:var(--blue)}
-.cs-count{font-size:13px;font-weight:700;min-width:24px;text-align:right}
-.rules-c{background:var(--white);border-radius:14px;padding:14px;font-size:13px;line-height:1.9;color:var(--text2);box-shadow:0 1px 4px rgba(0,0,0,.05)}
-</style>
+    .nbtn .ni {
+      font-size: 22px;
+      transition: transform .2s
+    }
+
+    .nbtn .nl {
+      font-size: 10px;
+      font-weight: 600
+    }
+
+    .nbtn.on {
+      color: var(--blue)
+    }
+
+    .nbtn.on .ni {
+      transform: scale(1.15)
+    }
+
+    /* Signal tugmasi alohida */
+    .nbtn.signal-center {
+      background: linear-gradient(135deg, #4F6EF7, #8B5CF6);
+      color: #fff;
+      border-radius: 20px;
+      padding: 10px 20px;
+      margin: 0 4px;
+      box-shadow: 0 4px 14px rgba(79, 110, 247, .45)
+    }
+
+    .nbtn.signal-center.on {
+      color: #fff
+    }
+
+    .nbtn.signal-center .ni {
+      font-size: 24px
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        box-shadow: 0 4px 14px rgba(79, 110, 247, .45)
+      }
+
+      50% {
+        box-shadow: 0 4px 22px rgba(79, 110, 247, .75)
+      }
+    }
+
+    .nbtn.signal-center {
+      animation: pulse 2s ease-in-out infinite
+    }
+
+    /* ══════════ MAP TAB ══════════ */
+    #tab-map {
+      position: relative
+    }
+
+    #ymap {
+      flex: 1;
+      width: 100%
+    }
+
+    .map-fab {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      background: var(--white);
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    /* ══════════ SIGNAL TAB ══════════ */
+    #tab-signal {
+      overflow-y: auto;
+      background: var(--bg)
+    }
+
+    /* Signal form card */
+    .signal-hero {
+      background: linear-gradient(135deg, #4F6EF7 0%, #8B5CF6 100%);
+      margin: 12px;
+      border-radius: 18px;
+      padding: 16px;
+      color: #fff;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px
+    }
+
+    .signal-hero-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, .2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0
+    }
+
+    .signal-hero-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px
+    }
+
+    .signal-hero-sub {
+      font-size: 12px;
+      opacity: .85;
+      line-height: 1.5
+    }
+
+    .sig-section {
+      margin: 0 12px 10px;
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .05)
+    }
+
+    .sig-section-hdr {
+      padding: 12px 14px 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .sig-section-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0
+    }
+
+    .si-green {
+      background: #D1FAE5
+    }
+
+    .si-blue {
+      background: #DBEAFE
+    }
+
+    .si-purple {
+      background: #EDE9FE
+    }
+
+    .sig-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .sig-section-sub {
+      font-size: 11px;
+      color: var(--text2);
+      margin-left: auto
+    }
+
+    /* GPS row */
+    .gps-row {
+      margin: 4px 14px 12px;
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer
+    }
+
+    .gps-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .gps-dot.wait {
+      background: #FCD34D
+    }
+
+    .gps-dot.ok {
+      background: var(--green);
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, .2)
+    }
+
+    .gps-dot.err {
+      background: var(--red)
+    }
+
+    .gps-txt {
+      font-size: 13px;
+      font-weight: 500;
+      flex: 1
+    }
+
+    .gps-sub {
+      font-size: 11px;
+      color: var(--text2)
+    }
+
+    /* Rasm tugmalari */
+    .photo-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 4px 14px 12px
+    }
+
+    .photo-btn {
+      border: 1.5px dashed var(--border);
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 16px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text2);
+      font-weight: 500
+    }
+
+    .photo-btn:active {
+      background: var(--border)
+    }
+
+    .photo-btn .pb-icon {
+      font-size: 28px
+    }
+
+    .preview-img-wrap {
+      margin: 4px 14px 12px;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative
+    }
+
+    .preview-img-wrap img {
+      width: 100%;
+      max-height: 180px;
+      object-fit: cover;
+      display: block
+    }
+
+    .rm-photo {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, .6);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    /* Textarea */
+    .sig-textarea {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: transparent;
+      padding: 4px 14px 14px;
+      resize: none;
+      line-height: 1.6
+    }
+
+    .sig-textarea::placeholder {
+      color: var(--gray)
+    }
+
+    /* Kategoriyalar */
+    .cats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px 14px 14px
+    }
+
+    .cat-btn {
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      border-radius: 24px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text2);
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
+
+    .cat-btn.sel {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff
+    }
+
+    .cat-btn .cb-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%
+    }
+
+    /* Ta'sir ko'rsatgich */
+    .impact-row {
+      margin: 0 12px 10px;
+      background: var(--white);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .impact-label {
+      font-size: 12px;
+      color: var(--text2)
+    }
+
+    .impact-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--orange)
+    }
+
+    .impact-hint {
+      font-size: 11px;
+      color: var(--text2)
+    }
+
+    /* Submit tugma */
+    .submit-wrap {
+      padding: 4px 12px 12px
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(90deg, #4F6EF7, #8B5CF6);
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: .3px
+    }
+
+    .btn-submit:disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+
+    /* ══════════ LENTA TAB ══════════ */
+    #tab-lenta {
+      overflow-y: auto;
+      background: var(--bg)
+    }
+
+    .lenta-hdr {
+      padding: 14px 14px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .lenta-title {
+      font-size: 17px;
+      font-weight: 800
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 6px;
+      padding: 0 12px 10px;
+      overflow-x: auto
+    }
+
+    .filter-row::-webkit-scrollbar {
+      display: none
+    }
+
+    .f-btn {
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text2);
+      white-space: nowrap;
+      flex-shrink: 0
+    }
+
+    .f-btn.on {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff
+    }
+
+    .post-card {
+      background: var(--white);
+      margin: 0 12px 10px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .06)
+    }
+
+    .post-cat-bar {
+      height: 4px
+    }
+
+    .post-body {
+      padding: 12px 14px 8px
+    }
+
+    .post-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px
+    }
+
+    .badge-muammo {
+      background: #FEE2E2;
+      color: #DC2626
+    }
+
+    .badge-narkotik {
+      background: #F3F4F6;
+      color: #374151
+    }
+
+    .badge-jinoyat {
+      background: #FEF3C7;
+      color: #92400E
+    }
+
+    .badge-axlat {
+      background: #D1FAE5;
+      color: #065F46
+    }
+
+    .badge-kasal {
+      background: #DBEAFE;
+      color: #1D4ED8
+    }
+
+    .badge-boshqa {
+      background: #EDE9FE;
+      color: #5B21B6
+    }
+
+    .post-desc {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 8px
+    }
+
+    .post-img-thumb {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      display: block;
+      border-radius: 10px;
+      margin-bottom: 8px
+    }
+
+    .post-footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border)
+    }
+
+    .post-author {
+      font-size: 12px;
+      color: var(--text2);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .post-role {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      flex-shrink: 0
+    }
+
+    .pr-rais {
+      background: #DBEAFE;
+      color: #1D4ED8
+    }
+
+    .pr-inspektor {
+      background: #EDE9FE;
+      color: #5B21B6
+    }
+
+    .pr-aholi {
+      background: #F1F5F9;
+      color: #64748B
+    }
+
+    .btn-like {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 8px
+    }
+
+    .btn-like.liked {
+      color: var(--red)
+    }
+
+    .btn-hal {
+      background: #D1FAE5;
+      color: #065F46;
+      border: none;
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0
+    }
+
+    .resolved-badge {
+      font-size: 11px;
+      color: var(--green);
+      font-weight: 700
+    }
+
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text2)
+    }
+
+    .empty-icon {
+      font-size: 42px;
+      margin-bottom: 10px
+    }
+
+    /* ══════════ CHAT TAB ══════════ */
+    #tab-chat {
+      overflow: hidden
+    }
+
+    .chat-views {
+      display: flex;
+      flex-direction: column;
+      height: 100%
+    }
+
+    .chat-list-wrap {
+      display: flex;
+      flex-direction: column;
+      height: 100%
+    }
+
+    .chat-list-wrap.hide {
+      display: none
+    }
+
+    .chat-list-hdr {
+      padding: 14px 14px 10px;
+      font-size: 17px;
+      font-weight: 800;
+      background: var(--white);
+      border-bottom: 1px solid var(--border)
+    }
+
+    .chat-list-body {
+      overflow-y: auto;
+      flex: 1
+    }
+
+    .chat-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      background: var(--white);
+      transition: background .1s
+    }
+
+    .chat-item:active {
+      background: var(--bg)
+    }
+
+    .chat-av {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      flex-shrink: 0
+    }
+
+    .ca-group {
+      background: linear-gradient(135deg, #DBEAFE, #EDE9FE);
+      color: var(--blue)
+    }
+
+    .ca-user {
+      background: #D1FAE5;
+      color: var(--teal)
+    }
+
+    .chat-meta {
+      flex: 1;
+      min-width: 0
+    }
+
+    .chat-name2 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 2px
+    }
+
+    .chat-last2 {
+      font-size: 12px;
+      color: var(--text2);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .chat-time2 {
+      font-size: 11px;
+      color: var(--text2);
+      flex-shrink: 0
+    }
+
+    /* Chat room */
+    .chat-room-wrap {
+      display: none;
+      flex-direction: column;
+      height: 100%
+    }
+
+    .chat-room-wrap.on {
+      display: flex
+    }
+
+    .chat-room-hdr {
+      padding: 10px 14px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: var(--text);
+      padding: 0 6px 0 0
+    }
+
+    .room-name {
+      font-size: 15px;
+      font-weight: 700;
+      flex: 1
+    }
+
+    .room-sub {
+      font-size: 11px;
+      color: var(--text2)
+    }
+
+    .msgs-wrap {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 12px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: var(--bg)
+    }
+
+    .msg-b {
+      max-width: 80%;
+      padding: 9px 13px;
+      border-radius: 16px;
+      font-size: 13px;
+      line-height: 1.5;
+      word-break: break-word
+    }
+
+    .msg-out {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #4F6EF7, #8B5CF6);
+      color: #fff;
+      border-bottom-right-radius: 4px
+    }
+
+    .msg-in {
+      align-self: flex-start;
+      background: var(--white);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .07)
+    }
+
+    .msg-sndr {
+      font-size: 10px;
+      font-weight: 700;
+      margin-bottom: 3px;
+      opacity: .7
+    }
+
+    .msg-t {
+      font-size: 10px;
+      margin-top: 3px;
+      opacity: .6;
+      text-align: right
+    }
+
+    .msg-input-bar {
+      padding: 8px 12px;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0
+    }
+
+    .msg-input {
+      flex: 1;
+      border: 1.5px solid var(--border);
+      border-radius: 24px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      background: var(--bg)
+    }
+
+    .msg-input:focus {
+      border-color: var(--blue);
+      background: var(--white)
+    }
+
+    .send-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4F6EF7, #8B5CF6);
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    /* ══════════ TAHLIL TAB ══════════ */
+    #tab-tahlil {
+      overflow-y: auto;
+      padding: 12px;
+      gap: 10px;
+      display: none;
+      flex-direction: column;
+      background: var(--bg)
+    }
+
+    #tab-tahlil.on {
+      display: flex
+    }
+
+    .tahlil-score {
+      background: linear-gradient(135deg, #4F6EF7, #8B5CF6);
+      border-radius: 18px;
+      padding: 20px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2px
+    }
+
+    .ts-left .ts-lbl {
+      font-size: 12px;
+      opacity: .8;
+      margin-bottom: 4px
+    }
+
+    .ts-left .ts-num {
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1
+    }
+
+    .ts-left .ts-rank {
+      font-size: 12px;
+      opacity: .75;
+      margin-top: 6px
+    }
+
+    .ts-icon {
+      font-size: 52px;
+      opacity: .2
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px
+    }
+
+    .stat-c {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .05)
+    }
+
+    .stat-n {
+      font-size: 26px;
+      font-weight: 900
+    }
+
+    .stat-l {
+      font-size: 11px;
+      color: var(--text2);
+      margin-top: 2px
+    }
+
+    .section-h {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: var(--text)
+    }
+
+    .lb-wrap {
+      background: var(--white);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .05)
+    }
+
+    .lb-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .lb-item:last-child {
+      border-bottom: none
+    }
+
+    .lb-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0
+    }
+
+    .lb-1 {
+      background: #FEF3C7;
+      color: #D97706
+    }
+
+    .lb-2 {
+      background: #F1F5F9;
+      color: #475569
+    }
+
+    .lb-3 {
+      background: #FEF0E7;
+      color: #C2580A
+    }
+
+    .lb-n {
+      background: var(--bg);
+      color: var(--text2)
+    }
+
+    .lb-name2 {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 600
+    }
+
+    .lb-score2 {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--blue)
+    }
+
+    /* Kategoriya statistika */
+    .cat-stats {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .05)
+    }
+
+    .cs-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px
+    }
+
+    .cs-row:last-child {
+      margin-bottom: 0
+    }
+
+    .cs-icon {
+      font-size: 16px;
+      width: 24px;
+      text-align: center
+    }
+
+    .cs-label {
+      font-size: 13px;
+      color: var(--text2);
+      flex: 1
+    }
+
+    .cs-bar-wrap {
+      width: 100px;
+      height: 6px;
+      background: var(--bg);
+      border-radius: 3px;
+      overflow: hidden
+    }
+
+    .cs-bar {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--blue)
+    }
+
+    .cs-count {
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 24px;
+      text-align: right
+    }
+
+    .rules-c {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 13px;
+      line-height: 1.9;
+      color: var(--text2);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .05)
+    }
+  </style>
 </head>
+
 <body>
 
-<div id="loading">
-  <div style="font-size:48px">🏘️</div>
-  <div class="spin"></div>
-  <p>Mahalla Bot yuklanmoqda...</p>
-</div>
-<div class="toast" id="toast"></div>
-
-<!-- HEADER -->
-<div class="hdr">
-  <div class="hdr-logo">🏘️</div>
-  <div class="hdr-info">
-    <div class="hdr-name" id="hdr-name">Mahalla Bot</div>
-    <div class="hdr-sub" id="hdr-sub">Yuklanmoqda...</div>
+  <div id="loading">
+    <div style="font-size:48px">🏘️</div>
+    <div class="spin"></div>
+    <p>Mahalla Bot yuklanmoqda...</p>
   </div>
-  <div class="hdr-pill" id="hdr-pill">—</div>
-</div>
+  <div class="toast" id="toast"></div>
 
-<!-- ═══ TAB: XARITA ═══ -->
-<div class="tab on" id="tab-map">
-  <div id="ymap" style="flex:1;width:100%"></div>
-  <button class="map-fab" onclick="centerMap()" title="Mening joylashuvim">📍</button>
-</div>
-
-<!-- ═══ TAB: LENTA ═══ -->
-<div class="tab" id="tab-lenta">
-  <div class="lenta-hdr">
-    <div class="lenta-title">📋 Mahalla lentasi</div>
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-logo">🏘️</div>
+    <div class="hdr-info">
+      <div class="hdr-name" id="hdr-name">Mahalla Bot</div>
+      <div class="hdr-sub" id="hdr-sub">Yuklanmoqda...</div>
+    </div>
+    <div class="hdr-pill" id="hdr-pill">—</div>
   </div>
-  <div class="filter-row" id="filter-row">
-    <button class="f-btn on" data-f="all" onclick="setFilter(this)">Hammasi</button>
-    <button class="f-btn" data-f="muammo" onclick="setFilter(this)">🔴 Muammo</button>
-    <button class="f-btn" data-f="narkotik" onclick="setFilter(this)">🚨 Narkotik</button>
-    <button class="f-btn" data-f="kasal" onclick="setFilter(this)">🏥 Kasal</button>
-    <button class="f-btn" data-f="axlat" onclick="setFilter(this)">🗑️ Axlat</button>
-    <button class="f-btn" data-f="jinoyat" onclick="setFilter(this)">⚠️ Jinoyat</button>
-    <button class="f-btn" data-f="boshqa" onclick="setFilter(this)">💬 Boshqa</button>
-  </div>
-  <div id="feed-list" style="flex:1;overflow-y:auto;padding-bottom:8px">
-    <div class="empty"><div class="empty-icon">📭</div><div>Hozircha yangilik yo'q</div></div>
-  </div>
-</div>
 
-<!-- ═══ TAB: SIGNAL ═══ -->
-<div class="tab" id="tab-signal">
-  <div style="flex:1;overflow-y:auto;padding-bottom:8px">
+  <!-- ═══ TAB: XARITA ═══ -->
+  <div class="tab on" id="tab-map">
+    <div id="ymap" style="flex:1;width:100%"></div>
+    <button class="map-fab" onclick="centerMap()" title="Mening joylashuvim">📍</button>
+  </div>
 
-    <div class="signal-hero">
-      <div class="signal-hero-icon">📢</div>
-      <div>
-        <div class="signal-hero-title">Muammoni xabar bering!</div>
-        <div class="signal-hero-sub">Rasm va batafsil izoh qo'shsangiz, tegishli tashkilot <b>tekshiruvda birinchi</b> ko'rib chiqadi</div>
+  <!-- ═══ TAB: LENTA ═══ -->
+  <div class="tab" id="tab-lenta">
+    <div class="lenta-hdr">
+      <div class="lenta-title">📋 Mahalla lentasi</div>
+    </div>
+    <div class="filter-row" id="filter-row">
+      <button class="f-btn on" data-f="all" onclick="setFilter(this)">Hammasi</button>
+      <button class="f-btn" data-f="muammo" onclick="setFilter(this)">🔴 Muammo</button>
+      <button class="f-btn" data-f="narkotik" onclick="setFilter(this)">🚨 Narkotik</button>
+      <button class="f-btn" data-f="kasal" onclick="setFilter(this)">🏥 Kasal</button>
+      <button class="f-btn" data-f="axlat" onclick="setFilter(this)">🗑️ Axlat</button>
+      <button class="f-btn" data-f="jinoyat" onclick="setFilter(this)">⚠️ Jinoyat</button>
+      <button class="f-btn" data-f="boshqa" onclick="setFilter(this)">💬 Boshqa</button>
+    </div>
+    <div id="feed-list" style="flex:1;overflow-y:auto;padding-bottom:8px">
+      <div class="empty">
+        <div class="empty-icon">📭</div>
+        <div>Hozircha yangilik yo'q</div>
       </div>
     </div>
+  </div>
 
-    <!-- Ta'sir -->
-    <div class="impact-row">
-      <div>
-        <div class="impact-label">📈 Ta'sir</div>
-        <div class="impact-val" id="impact-val">0%</div>
-      </div>
-      <div class="impact-hint">Rasm qo'shsangiz ko'proq tarqaladi</div>
-    </div>
+  <!-- ═══ TAB: SIGNAL ═══ -->
+  <div class="tab" id="tab-signal">
+    <div style="flex:1;overflow-y:auto;padding-bottom:8px">
 
-    <!-- Joylashuv -->
-    <div class="sig-section">
-      <div class="sig-section-hdr">
-        <div class="sig-section-icon si-green">📍</div>
-        <div class="sig-section-title">Joylashuvni aniqlash</div>
-        <div class="sig-section-sub" id="gps-sub">Bosing — GPS avtomatik</div>
-      </div>
-      <div class="gps-row" id="gps-row" onclick="retryGPS()">
-        <div class="gps-dot wait" id="gps-dot"></div>
+      <div class="signal-hero">
+        <div class="signal-hero-icon">📢</div>
         <div>
-          <div class="gps-txt" id="gps-txt">GPS aniqlanmoqda...</div>
+          <div class="signal-hero-title">Muammoni xabar bering!</div>
+          <div class="signal-hero-sub">Rasm va batafsil izoh qo'shsangiz, tegishli tashkilot <b>tekshiruvda birinchi</b>
+            ko'rib chiqadi</div>
         </div>
       </div>
-    </div>
 
-    <!-- Rasm -->
-    <div class="sig-section">
-      <div class="sig-section-hdr">
-        <div class="sig-section-icon si-blue">📷</div>
-        <div class="sig-section-title">Rasm yuklash</div>
-      </div>
-      <div class="photo-btns" id="photo-btns">
-        <button class="photo-btn" onclick="openCam()">
-          <div class="pb-icon">📸</div>
-          <div>Kamera</div>
-        </button>
-        <button class="photo-btn" onclick="openGallery()">
-          <div class="pb-icon">🖼️</div>
-          <div>Galereya</div>
-        </button>
-      </div>
-      <div id="preview-wrap" style="display:none">
-        <div class="preview-img-wrap">
-          <img id="preview-img" src="" alt="">
-          <button class="rm-photo" onclick="rmPhoto()">✕</button>
-        </div>
-      </div>
-      <input type="file" id="photo-cam" accept="image/*" capture="environment" style="display:none" onchange="onPhoto(this)">
-      <input type="file" id="photo-gal" accept="image/*" style="display:none" onchange="onPhoto(this)">
-    </div>
-
-    <!-- Izoh -->
-    <div class="sig-section">
-      <div class="sig-section-hdr">
-        <div class="sig-section-icon si-purple">✏️</div>
-        <div class="sig-section-title">Izoh</div>
-      </div>
-      <textarea class="sig-textarea" id="post-desc" rows="4" placeholder="Muammoni tasvirlab bering..." oninput="updateImpact()"></textarea>
-    </div>
-
-    <!-- Kategoriyalar -->
-    <div class="sig-section">
-      <div class="sig-section-hdr">
-        <div class="sig-section-icon si-green">🏷️</div>
-        <div class="sig-section-title">Kategoriya</div>
-      </div>
-      <div class="cats">
-        <button class="cat-btn sel" data-t="muammo" onclick="selCat(this)">
-          <div class="cb-dot" style="background:#EF4444"></div> Muammo
-        </button>
-        <button class="cat-btn" data-t="narkotik" onclick="selCat(this)">
-          <div class="cb-dot" style="background:#374151"></div> Narkotik
-        </button>
-        <button class="cat-btn" data-t="kasal" onclick="selCat(this)">
-          <div class="cb-dot" style="background:#3B82F6"></div> Kasal
-        </button>
-        <button class="cat-btn" data-t="axlat" onclick="selCat(this)">
-          <div class="cb-dot" style="background:#22C55E"></div> Axlat
-        </button>
-        <button class="cat-btn" data-t="jinoyat" onclick="selCat(this)">
-          <div class="cb-dot" style="background:#F59E0B"></div> Jinoyat
-        </button>
-        <button class="cat-btn" data-t="boshqa" onclick="selCat(this)">
-          <div class="cb-dot" style="background:#8B5CF6"></div> Boshqa
-        </button>
-      </div>
-    </div>
-
-    <div class="submit-wrap">
-      <button class="btn-submit" id="post-btn" onclick="submitPost()">
-        ➤ Signal yuborish
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ TAB: CHAT ═══ -->
-<div class="tab" id="tab-chat">
-  <div class="chat-views" style="height:100%">
-    <!-- Chat ro'yxati -->
-    <div class="chat-list-wrap" id="chat-list-wrap">
-      <div class="chat-list-hdr">💬 Chatlar</div>
-      <div class="chat-list-body" id="chat-list-body"></div>
-    </div>
-    <!-- Chat xona -->
-    <div class="chat-room-wrap" id="chat-room-wrap">
-      <div class="chat-room-hdr">
-        <button class="back-btn" onclick="backToList()">‹</button>
+      <!-- Ta'sir -->
+      <div class="impact-row">
         <div>
-          <div class="room-name" id="room-name">Chat</div>
-          <div class="room-sub" id="room-sub"></div>
+          <div class="impact-label">📈 Ta'sir</div>
+          <div class="impact-val" id="impact-val">0%</div>
+        </div>
+        <div class="impact-hint">Rasm qo'shsangiz ko'proq tarqaladi</div>
+      </div>
+
+      <!-- Joylashuv -->
+      <div class="sig-section">
+        <div class="sig-section-hdr">
+          <div class="sig-section-icon si-green">📍</div>
+          <div class="sig-section-title">Joylashuvni aniqlash</div>
+          <div class="sig-section-sub" id="gps-sub">Bosing — GPS avtomatik</div>
+        </div>
+        <div class="gps-row" id="gps-row" onclick="retryGPS()">
+          <div class="gps-dot wait" id="gps-dot"></div>
+          <div>
+            <div class="gps-txt" id="gps-txt">GPS aniqlanmoqda...</div>
+          </div>
         </div>
       </div>
-      <div class="msgs-wrap" id="msgs-wrap"></div>
-      <div class="msg-input-bar">
-        <input class="msg-input" id="msg-inp" placeholder="Xabar yozing..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
-        <button class="send-btn" onclick="sendMsg()">➤</button>
+
+      <!-- Rasm -->
+      <div class="sig-section">
+        <div class="sig-section-hdr">
+          <div class="sig-section-icon si-blue">📷</div>
+          <div class="sig-section-title">Rasm yuklash</div>
+        </div>
+        <div class="photo-btns" id="photo-btns">
+          <button class="photo-btn" onclick="openCam()">
+            <div class="pb-icon">📸</div>
+            <div>Kamera</div>
+          </button>
+          <button class="photo-btn" onclick="openGallery()">
+            <div class="pb-icon">🖼️</div>
+            <div>Galereya</div>
+          </button>
+        </div>
+        <div id="preview-wrap" style="display:none">
+          <div class="preview-img-wrap">
+            <img id="preview-img" src="" alt="">
+            <button class="rm-photo" onclick="rmPhoto()">✕</button>
+          </div>
+        </div>
+        <input type="file" id="photo-cam" accept="image/*" capture="environment" style="display:none"
+          onchange="onPhoto(this)">
+        <input type="file" id="photo-gal" accept="image/*" style="display:none" onchange="onPhoto(this)">
+      </div>
+
+      <!-- Izoh -->
+      <div class="sig-section">
+        <div class="sig-section-hdr">
+          <div class="sig-section-icon si-purple">✏️</div>
+          <div class="sig-section-title">Izoh</div>
+        </div>
+        <textarea class="sig-textarea" id="post-desc" rows="4" placeholder="Muammoni tasvirlab bering..."
+          oninput="updateImpact()"></textarea>
+      </div>
+
+      <!-- Kategoriyalar -->
+      <div class="sig-section">
+        <div class="sig-section-hdr">
+          <div class="sig-section-icon si-green">🏷️</div>
+          <div class="sig-section-title">Kategoriya</div>
+        </div>
+        <div class="cats">
+          <button class="cat-btn sel" data-t="muammo" onclick="selCat(this)">
+            <div class="cb-dot" style="background:#EF4444"></div> Muammo
+          </button>
+          <button class="cat-btn" data-t="narkotik" onclick="selCat(this)">
+            <div class="cb-dot" style="background:#374151"></div> Narkotik
+          </button>
+          <button class="cat-btn" data-t="kasal" onclick="selCat(this)">
+            <div class="cb-dot" style="background:#3B82F6"></div> Kasal
+          </button>
+          <button class="cat-btn" data-t="axlat" onclick="selCat(this)">
+            <div class="cb-dot" style="background:#22C55E"></div> Axlat
+          </button>
+          <button class="cat-btn" data-t="jinoyat" onclick="selCat(this)">
+            <div class="cb-dot" style="background:#F59E0B"></div> Jinoyat
+          </button>
+          <button class="cat-btn" data-t="boshqa" onclick="selCat(this)">
+            <div class="cb-dot" style="background:#8B5CF6"></div> Boshqa
+          </button>
+        </div>
+      </div>
+
+      <div class="submit-wrap">
+        <button class="btn-submit" id="post-btn" onclick="submitPost()">
+          ➤ Signal yuborish
+        </button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- ═══ TAB: TAHLIL ═══ -->
-<div class="tab" id="tab-tahlil">
-  <div class="tahlil-score">
-    <div class="ts-left">
-      <div class="ts-lbl">⭐ Sizning ballaringiz</div>
-      <div class="ts-num" id="my-score">—</div>
-      <div class="ts-rank" id="my-rank">Yuklanmoqda...</div>
+  <!-- ═══ TAB: CHAT ═══ -->
+  <div class="tab" id="tab-chat">
+    <div class="chat-views" style="height:100%">
+      <!-- Chat ro'yxati -->
+      <div class="chat-list-wrap" id="chat-list-wrap">
+        <div class="chat-list-hdr">💬 Chatlar</div>
+        <div class="chat-list-body" id="chat-list-body"></div>
+      </div>
+      <!-- Chat xona -->
+      <div class="chat-room-wrap" id="chat-room-wrap">
+        <div class="chat-room-hdr">
+          <button class="back-btn" onclick="backToList()">‹</button>
+          <div>
+            <div class="room-name" id="room-name">Chat</div>
+            <div class="room-sub" id="room-sub"></div>
+          </div>
+        </div>
+        <div class="msgs-wrap" id="msgs-wrap"></div>
+        <div class="msg-input-bar">
+          <input class="msg-input" id="msg-inp" placeholder="Xabar yozing..."
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
+          <button class="send-btn" onclick="sendMsg()">➤</button>
+        </div>
+      </div>
     </div>
-    <div class="ts-icon">🏆</div>
   </div>
 
-  <div class="stats-grid">
-    <div class="stat-c"><div class="stat-n" id="s-total" style="color:var(--blue)">—</div><div class="stat-l">Jami signal</div></div>
-    <div class="stat-c"><div class="stat-n" id="s-pend" style="color:var(--red)">—</div><div class="stat-l">Hal etilmagan</div></div>
-    <div class="stat-c"><div class="stat-n" id="s-res" style="color:var(--green)">—</div><div class="stat-l">Hal qilindi</div></div>
-    <div class="stat-c"><div class="stat-n" id="s-mem" style="color:var(--purple)">—</div><div class="stat-l">A'zolar</div></div>
+  <!-- ═══ TAB: TAHLIL ═══ -->
+  <div class="tab" id="tab-tahlil">
+    <div class="tahlil-score">
+      <div class="ts-left">
+        <div class="ts-lbl">⭐ Sizning ballaringiz</div>
+        <div class="ts-num" id="my-score">—</div>
+        <div class="ts-rank" id="my-rank">Yuklanmoqda...</div>
+      </div>
+      <div class="ts-icon">🏆</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-c">
+        <div class="stat-n" id="s-total" style="color:var(--blue)">—</div>
+        <div class="stat-l">Jami signal</div>
+      </div>
+      <div class="stat-c">
+        <div class="stat-n" id="s-pend" style="color:var(--red)">—</div>
+        <div class="stat-l">Hal etilmagan</div>
+      </div>
+      <div class="stat-c">
+        <div class="stat-n" id="s-res" style="color:var(--green)">—</div>
+        <div class="stat-l">Hal qilindi</div>
+      </div>
+      <div class="stat-c">
+        <div class="stat-n" id="s-mem" style="color:var(--purple)">—</div>
+        <div class="stat-l">A'zolar</div>
+      </div>
+    </div>
+
+    <div class="section-h">📊 Kategoriyalar bo'yicha</div>
+    <div class="cat-stats" id="cat-stats">
+      <div style="color:var(--text2);font-size:13px;text-align:center;padding:10px">Yuklanmoqda...</div>
+    </div>
+
+    <div class="section-h">🏆 Faollar reytingi</div>
+    <div class="lb-wrap" id="leaderboard">
+      <div class="empty">
+        <div class="empty-icon">⏳</div>
+      </div>
+    </div>
+
+    <div class="rules-c">
+      📡 Signal yuborish: <b>+5 ball</b><br>
+      📷 Rasm bilan: <b>+3 bonus ball</b><br>
+      👍 Post yoqilsa: <b>+2 ball</b><br>
+      ✅ Muammo hal qilinganda: <b>+10 ball</b>
+    </div>
   </div>
 
-  <div class="section-h">📊 Kategoriyalar bo'yicha</div>
-  <div class="cat-stats" id="cat-stats">
-    <div style="color:var(--text2);font-size:13px;text-align:center;padding:10px">Yuklanmoqda...</div>
-  </div>
+  <!-- BOTTOM NAV -->
+  <nav class="bnav">
+    <button class="nbtn on" id="n-map" onclick="goTab('map')">
+      <span class="ni">🗺️</span><span class="nl">Xarita</span>
+    </button>
+    <button class="nbtn" id="n-lenta" onclick="goTab('lenta')">
+      <span class="ni">📋</span><span class="nl">Lenta</span>
+    </button>
+    <button class="nbtn signal-center on" id="n-signal" onclick="goTab('signal')">
+      <span class="ni">📡</span><span class="nl">Signal</span>
+    </button>
+    <button class="nbtn" id="n-chat" onclick="goTab('chat')">
+      <span class="ni">💬</span><span class="nl">Chat</span>
+    </button>
+    <button class="nbtn" id="n-tahlil" onclick="goTab('tahlil')">
+      <span class="ni">📊</span><span class="nl">Tahlil</span>
+    </button>
+  </nav>
 
-  <div class="section-h">🏆 Faollar reytingi</div>
-  <div class="lb-wrap" id="leaderboard">
-    <div class="empty"><div class="empty-icon">⏳</div></div>
-  </div>
+  <script>
+    // Yandex Maps yuklanmasa ham dastur ishlaydi
+    (function () {
+      var s = document.createElement('script');
+      s.src = 'https://api-maps.yandex.ru/2.1/?lang=uz_UZ&apikey=6e799f0e-abd1-4c51-a0ad-29fc1ecb3845';
+      s.onerror = function () { console.warn('Yandex Maps yuklanmadi'); };
+      document.head.appendChild(s);
+    })();
+  </script>
+  <script>
+    // ══ STATE ═════════════════════════════════════════════════════
+    const tg = window.Telegram?.WebApp;
+    if (tg) { tg.expand(); tg.ready(); }
 
-  <div class="rules-c">
-    📡 Signal yuborish: <b>+5 ball</b><br>
-    📷 Rasm bilan: <b>+3 bonus ball</b><br>
-    👍 Post yoqilsa: <b>+2 ball</b><br>
-    ✅ Muammo hal qilinganda: <b>+10 ball</b>
-  </div>
-</div>
-
-<!-- BOTTOM NAV -->
-<nav class="bnav">
-  <button class="nbtn on" id="n-map" onclick="goTab('map')">
-    <span class="ni">🗺️</span><span class="nl">Xarita</span>
-  </button>
-  <button class="nbtn" id="n-lenta" onclick="goTab('lenta')">
-    <span class="ni">📋</span><span class="nl">Lenta</span>
-  </button>
-  <button class="nbtn signal-center on" id="n-signal" onclick="goTab('signal')">
-    <span class="ni">📡</span><span class="nl">Signal</span>
-  </button>
-  <button class="nbtn" id="n-chat" onclick="goTab('chat')">
-    <span class="ni">💬</span><span class="nl">Chat</span>
-  </button>
-  <button class="nbtn" id="n-tahlil" onclick="goTab('tahlil')">
-    <span class="ni">📊</span><span class="nl">Tahlil</span>
-  </button>
-</nav>
-
-<script>
-// Yandex Maps yuklanmasa ham dastur ishlaydi
-(function(){
-  var s = document.createElement('script');
-  s.src = 'https://api-maps.yandex.ru/2.1/?lang=uz_UZ&apikey=6e799f0e-abd1-4c51-a0ad-29fc1ecb3845';
-  s.onerror = function(){ console.warn('Yandex Maps yuklanmadi'); };
-  document.head.appendChild(s);
-})();
-</script>
-<script>
-// ══ STATE ═════════════════════════════════════════════════════
-const tg = window.Telegram?.WebApp;
-if(tg){ tg.expand(); tg.ready(); }
-
-// CHAT_ID olish — 4 usulda
-let CHAT_ID = null;
-try {
-  // 1: URL ?start= parametri (bot yuboradi)
-  const urlParams = new URLSearchParams(window.location.search);
-  const fromUrl = urlParams.get('start');
-  if (fromUrl && /^\d+$/.test(fromUrl)) {
-    CHAT_ID = fromUrl;
-    console.log('CHAT_ID URL dan:', CHAT_ID);
-  }
-
-  // 2: tg.initDataUnsafe
-  if (!CHAT_ID) {
-    const uid = tg?.initDataUnsafe?.user?.id;
-    if (uid) { CHAT_ID = String(uid); console.log('CHAT_ID initDataUnsafe dan:', CHAT_ID); }
-  }
-
-  // 3: initData parse
-  if (!CHAT_ID && tg?.initData) {
-    const p = new URLSearchParams(tg.initData);
-    const u = JSON.parse(p.get('user') || '{}');
-    if (u.id) { CHAT_ID = String(u.id); console.log('CHAT_ID initData dan:', CHAT_ID); }
-  }
-
-  // 4: start_param
-  if (!CHAT_ID) {
-    const sp = tg?.initDataUnsafe?.start_param;
-    if (sp && /^\d+$/.test(sp)) { CHAT_ID = sp; console.log('CHAT_ID start_param dan:', CHAT_ID); }
-  }
-} catch(e) { console.warn('CHAT_ID xato:', e); }
-
-console.log('FINAL CHAT_ID:', CHAT_ID, 'URL:', window.location.href);ser=null;
-let myMap=null, postType='muammo', photoFile=null;
-let curTab='map', chatMode='group', chatContactId=null;
-let chatPoll=null, allPosts=[], activeFilter='all';
-
-// ══ INIT ══════════════════════════════════════════════════════
-window.addEventListener('load', async()=>{
-  // Loading ekranini 3 soniyadan keyin majburiy yashirish
-  setTimeout(()=>{ document.getElementById('loading').style.display='none'; }, 3000);
-  
-  await loadUser();
-  startGPS();
-  loadPosts();
-  
-  // Yandex Maps alohida yuklanadi — yuklanmasa ham dastur ishlaydi
-  if(typeof ymaps !== 'undefined'){
-    initMap();
-  } else {
-    document.getElementById('loading').style.display='none';
-    // Maps o'rniga xabar
-    document.getElementById('ymap').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#64748B;gap:8px"><div style="font-size:36px">🗺️</div><div style="font-size:14px">Xarita yuklanmadi</div><div style="font-size:12px">Yandex API kaliti kerak</div></div>';
-  }
-  
-  document.getElementById('loading').style.display='none';
-});
-
-// ══ USER ══════════════════════════════════════════════════════
-async function loadUser(){
-  if(!CHAT_ID){
-    document.getElementById('hdr-sub').textContent='⚠️ Telegram orqali oching';
-    return;
-  }
-  try{
-    const r=await fetch(`${API}/api/user/${CHAT_ID}`);
-    if(r.status===404){
-      document.getElementById('hdr-sub').textContent='⚠️ Botda /start bosing';
-      showRegBanner(); return;
-    }
-    if(r.ok){
-      const data=await r.json();
-      if(data.error||!data.registered){
-        document.getElementById('hdr-sub').textContent='⚠️ Botda /start bosing';
-        showRegBanner(); return;
+    // CHAT_ID olish — 4 usulda
+    let CHAT_ID = null;
+    try {
+      // 1: URL ?start= parametri (bot yuboradi)
+      const urlParams = new URLSearchParams(window.location.search);
+      const fromUrl = urlParams.get('start');
+      if (fromUrl && /^\d+$/.test(fromUrl)) {
+        CHAT_ID = fromUrl;
+        console.log('CHAT_ID URL dan:', CHAT_ID);
       }
-      myUser=data;
-      document.getElementById('hdr-name').textContent=myUser.full_name||'Mahalla Bot';
-      document.getElementById('hdr-sub').textContent=myUser.mahalla_id?'\u{1F3D8}\uFE0F '+myUser.mahalla_id:'Mahalla Bot';
-    }
-  }catch(e){ console.error('loadUser:',e); }
-}
 
-function showRegBanner(){
-  if(document.getElementById('reg-banner')) return;
-  const b=document.createElement('div');
-  b.id='reg-banner';
-  b.style.cssText='position:fixed;top:58px;left:0;right:0;background:#FEF3C7;border-bottom:2px solid #FCD34D;padding:10px 16px;display:flex;align-items:center;gap:10px;z-index:200;font-size:13px;font-weight:600;color:#92400E';
-  b.innerHTML = `
+      // 2: tg.initDataUnsafe
+      if (!CHAT_ID) {
+        const uid = tg?.initDataUnsafe?.user?.id;
+        if (uid) { CHAT_ID = String(uid); console.log('CHAT_ID initDataUnsafe dan:', CHAT_ID); }
+      }
+
+      // 3: initData parse
+      if (!CHAT_ID && tg?.initData) {
+        const p = new URLSearchParams(tg.initData);
+        const u = JSON.parse(p.get('user') || '{}');
+        if (u.id) { CHAT_ID = String(u.id); console.log('CHAT_ID initData dan:', CHAT_ID); }
+      }
+
+      // 4: start_param
+      if (!CHAT_ID) {
+        const sp = tg?.initDataUnsafe?.start_param;
+        if (sp && /^\d+$/.test(sp)) { CHAT_ID = sp; console.log('CHAT_ID start_param dan:', CHAT_ID); }
+      }
+    } catch (e) { console.warn('CHAT_ID xato:', e); }
+
+    console.log('FINAL CHAT_ID:', CHAT_ID, 'URL:', window.location.href);
+    let ser = null;
+    let myMap = null, postType = 'muammo', photoFile = null;
+    let curTab = 'map', chatMode = 'group', chatContactId = null;
+    let chatPoll = null, allPosts = [], activeFilter = 'all';
+
+    // ══ INIT ══════════════════════════════════════════════════════
+    window.addEventListener('load', async () => {
+      // Loading ekranini 3 soniyadan keyin majburiy yashirish
+      setTimeout(() => { document.getElementById('loading').style.display = 'none'; }, 3000);
+
+      await loadUser();
+      startGPS();
+      loadPosts();
+
+      // Yandex Maps alohida yuklanadi — yuklanmasa ham dastur ishlaydi
+      if (typeof ymaps !== 'undefined') {
+        initMap();
+      } else {
+        document.getElementById('loading').style.display = 'none';
+        // Maps o'rniga xabar
+        document.getElementById('ymap').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#64748B;gap:8px"><div style="font-size:36px">🗺️</div><div style="font-size:14px">Xarita yuklanmadi</div><div style="font-size:12px">Yandex API kaliti kerak</div></div>';
+      }
+
+      document.getElementById('loading').style.display = 'none';
+    });
+
+    // ══ USER ══════════════════════════════════════════════════════
+    async function loadUser() {
+      if (!CHAT_ID) {
+        document.getElementById('hdr-sub').textContent = '⚠️ Telegram orqali oching';
+        return;
+      }
+      try {
+        const r = await fetch(`${API}/api/user/${CHAT_ID}`);
+        if (r.status === 404) {
+          document.getElementById('hdr-sub').textContent = '⚠️ Botda /start bosing';
+          showRegBanner(); return;
+        }
+        if (r.ok) {
+          const data = await r.json();
+          if (data.error || !data.registered) {
+            document.getElementById('hdr-sub').textContent = '⚠️ Botda /start bosing';
+            showRegBanner(); return;
+          }
+          myUser = data;
+          document.getElementById('hdr-name').textContent = myUser.full_name || 'Mahalla Bot';
+          document.getElementById('hdr-sub').textContent = myUser.mahalla_id ? '\u{1F3D8}\uFE0F ' + myUser.mahalla_id : 'Mahalla Bot';
+        }
+      } catch (e) { console.error('loadUser:', e); }
+    }
+
+    function showRegBanner() {
+      if (document.getElementById('reg-banner')) return;
+      const b = document.createElement('div');
+      b.id = 'reg-banner';
+      b.style.cssText = 'position:fixed;top:58px;left:0;right:0;background:#FEF3C7;border-bottom:2px solid #FCD34D;padding:10px 16px;display:flex;align-items:center;gap:10px;z-index:200;font-size:13px;font-weight:600;color:#92400E';
+      b.innerHTML = `
     <span>⚠️</span>
     <span style="flex:1">Avval botda ro'yxatdan o'ting!</span>
     <button onclick="window.Telegram?.WebApp?.close()" style="background:#F59E0B;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">Botga qaytish</button>
   `;
-  document.body.appendChild(b);
-}
-
-// ══ GPS ═══════════════════════════════════════════════════════
-function startGPS(){
-  if(!navigator.geolocation){ setGPS('err','GPS qo\'llab-quvvatlanmaydi'); return; }
-  setGPS('wait','Aniqlanmoqda...');
-  navigator.geolocation.getCurrentPosition(
-    pos=>{
-      myLat=pos.coords.latitude; myLng=pos.coords.longitude;
-      setGPS('ok',`${myLat.toFixed(5)}, ${myLng.toFixed(5)}`);
-      document.getElementById('gps-sub').textContent='✅ Aniqlandi';
-      updateLocServer();
-      if(myMap) try{ myMap.setCenter([myLat,myLng],15); }catch(e){}
-      updateImpact();
-    },
-    ()=>{ setGPS('err','Topilmadi — bosib qayta urining'); },
-    {enableHighAccuracy:true,timeout:10000,maximumAge:60000}
-  );
-}
-
-function retryGPS(){ startGPS(); }
-
-function setGPS(state, txt){
-  const dot=document.getElementById('gps-dot');
-  const label=document.getElementById('gps-txt');
-  dot.className='gps-dot '+state;
-  label.textContent=txt;
-}
-
-function updateLocServer(){
-  if(!CHAT_ID||!myLat) return;
-  fetch(`${API}/api/user/location`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CHAT_ID,lat:myLat,lng:myLng})}).catch(()=>{});
-}
-
-// ══ MAP ═══════════════════════════════════════════════════════
-const CAT_PRESET = {
-  muammo:'islands#redDotIcon',
-  narkotik:'islands#darkblueDotIcon',
-  kasal:'islands#blueDotIcon',
-  axlat:'islands#greenDotIcon',
-  jinoyat:'islands#orangeDotIcon',
-  boshqa:'islands#violetDotIcon'
-};
-
-function initMap(){
-  if(typeof ymaps === 'undefined') return;
-  const center = (myLat&&myLng)?[myLat,myLng]:[41.2995,69.2401];
-  try{
-    ymaps.ready(()=>{
-      try{
-        myMap = new ymaps.Map('ymap',{
-          center, zoom:15,
-          controls:['zoomControl','geolocationControl']
-        },{suppressMapOpenBlock:true});
-      }catch(e){
-        console.warn('Xarita yaratishda xato:', e);
-        document.getElementById('ymap').innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#64748B;gap:8px"><div style="font-size:36px">🗺️</div><div style="font-size:14px">Xarita kaliti kerak</div></div>';
-      }
-    });
-  }catch(e){ console.warn('ymaps.ready xato:', e); }
-}
-
-function centerMap(){
-  if(!myMap) return;
-  if(myLat&&myLng) myMap.setCenter([myLat,myLng],15);
-  else { startGPS(); toast('📍 GPS aniqlanmoqda...'); }
-}
-
-function renderMapPosts(posts){
-  if(!myMap) return;
-  ymaps.ready(()=>{
-    try{ myMap.geoObjects.removeAll(); }catch(e){}
-    // O'z belgisi
-    if(myLat&&myLng){
-      myMap.geoObjects.add(new ymaps.Placemark([myLat,myLng],
-        {balloonContent:`<b>${TGU?.first_name||'Men'}</b><br>Siz bu yerdasiz`},
-        {preset:'islands#blueCircleDotIcon'}
-      ));
+      document.body.appendChild(b);
     }
-    posts.forEach(p=>{
-      if(!p.lat||!p.lng) return;
-      try{
-        const mark = new ymaps.Placemark([p.lat,p.lng],{
-          balloonContentHeader: CAT_LABELS[p.type]||p.type,
-          balloonContentBody: `${esc(p.description)}<br><small>👤 ${esc(p.full_name)}</small>${p.photo_path?`<br><img src="${p.photo_path}" style="width:180px;border-radius:8px;margin-top:6px">`:''}`,
-          balloonContentFooter: fmtDate(p.created_at)
-        },{
-          preset: CAT_PRESET[p.type]||'islands#grayDotIcon'
+
+    // ══ GPS ═══════════════════════════════════════════════════════
+    function startGPS() {
+      if (!navigator.geolocation) { setGPS('err', 'GPS qo\'llab-quvvatlanmaydi'); return; }
+      setGPS('wait', 'Aniqlanmoqda...');
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          myLat = pos.coords.latitude; myLng = pos.coords.longitude;
+          setGPS('ok', `${myLat.toFixed(5)}, ${myLng.toFixed(5)}`);
+          document.getElementById('gps-sub').textContent = '✅ Aniqlandi';
+          updateLocServer();
+          if (myMap) try { myMap.setCenter([myLat, myLng], 15); } catch (e) { }
+          updateImpact();
+        },
+        () => { setGPS('err', 'Topilmadi — bosib qayta urining'); },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      );
+    }
+
+    function retryGPS() { startGPS(); }
+
+    function setGPS(state, txt) {
+      const dot = document.getElementById('gps-dot');
+      const label = document.getElementById('gps-txt');
+      dot.className = 'gps-dot ' + state;
+      label.textContent = txt;
+    }
+
+    function updateLocServer() {
+      if (!CHAT_ID || !myLat) return;
+      fetch(`${API}/api/user/location`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: CHAT_ID, lat: myLat, lng: myLng }) }).catch(() => { });
+    }
+
+    // ══ MAP ═══════════════════════════════════════════════════════
+    const CAT_PRESET = {
+      muammo: 'islands#redDotIcon',
+      narkotik: 'islands#darkblueDotIcon',
+      kasal: 'islands#blueDotIcon',
+      axlat: 'islands#greenDotIcon',
+      jinoyat: 'islands#orangeDotIcon',
+      boshqa: 'islands#violetDotIcon'
+    };
+
+    function initMap() {
+      if (typeof ymaps === 'undefined') return;
+      const center = (myLat && myLng) ? [myLat, myLng] : [41.2995, 69.2401];
+      try {
+        ymaps.ready(() => {
+          try {
+            myMap = new ymaps.Map('ymap', {
+              center, zoom: 15,
+              controls: ['zoomControl', 'geolocationControl']
+            }, { suppressMapOpenBlock: true });
+          } catch (e) {
+            console.warn('Xarita yaratishda xato:', e);
+            document.getElementById('ymap').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#64748B;gap:8px"><div style="font-size:36px">🗺️</div><div style="font-size:14px">Xarita kaliti kerak</div></div>';
+          }
         });
-        myMap.geoObjects.add(mark);
-      }catch(e){}
-    });
-  });
-}
+      } catch (e) { console.warn('ymaps.ready xato:', e); }
+    }
 
-// ══ POSTS / LENTA ════════════════════════════════════════════
-const CAT_LABELS={muammo:'🔴 Muammo',narkotik:'🚨 Narkotik',kasal:'🏥 Kasal',axlat:'🗑️ Axlat',jinoyat:'⚠️ Jinoyat',boshqa:'💬 Boshqa'};
-const CAT_COLORS={muammo:'#EF4444',narkotik:'#374151',kasal:'#3B82F6',axlat:'#22C55E',jinoyat:'#F59E0B',boshqa:'#8B5CF6'};
-const ROLE_LBL={rais:'Mahalla raisi',inspektor:'Inspektor',aholi:'Aholi'};
+    function centerMap() {
+      if (!myMap) return;
+      if (myLat && myLng) myMap.setCenter([myLat, myLng], 15);
+      else { startGPS(); toast('📍 GPS aniqlanmoqda...'); }
+    }
 
-async function loadPosts(){
-  try{
-    let url = myUser?.mahalla_id
-      ? `${API}/api/posts?mahalla_id=${myUser.mahalla_id}`
-      : myLat ? `${API}/api/posts?lat=${myLat}&lng=${myLng}` : null;
-    if(!url) return;
-    allPosts = await (await fetch(url)).json();
-    renderFeed(filteredPosts());
-    renderMapPosts(allPosts);
-    const pend = allPosts.filter(p=>p.type==='muammo'&&!p.resolved).length;
-    document.getElementById('hdr-pill').textContent = pend ? `${pend} muammo` : '✅ Tinch';
-    document.getElementById('hdr-pill').style.background = pend ? '#FEE2E2' : '#D1FAE5';
-    document.getElementById('hdr-pill').style.color = pend ? '#DC2626' : '#065F46';
-  }catch(e){}
-}
+    function renderMapPosts(posts) {
+      if (!myMap) return;
+      ymaps.ready(() => {
+        try { myMap.geoObjects.removeAll(); } catch (e) { }
+        // O'z belgisi
+        if (myLat && myLng) {
+          myMap.geoObjects.add(new ymaps.Placemark([myLat, myLng],
+            { balloonContent: `<b>${TGU?.first_name || 'Men'}</b><br>Siz bu yerdasiz` },
+            { preset: 'islands#blueCircleDotIcon' }
+          ));
+        }
+        posts.forEach(p => {
+          if (!p.lat || !p.lng) return;
+          try {
+            const mark = new ymaps.Placemark([p.lat, p.lng], {
+              balloonContentHeader: CAT_LABELS[p.type] || p.type,
+              balloonContentBody: `${esc(p.description)}<br><small>👤 ${esc(p.full_name)}</small>${p.photo_path ? `<br><img src="${p.photo_path}" style="width:180px;border-radius:8px;margin-top:6px">` : ''}`,
+              balloonContentFooter: fmtDate(p.created_at)
+            }, {
+              preset: CAT_PRESET[p.type] || 'islands#grayDotIcon'
+            });
+            myMap.geoObjects.add(mark);
+          } catch (e) { }
+        });
+      });
+    }
 
-function filteredPosts(){
-  if(activeFilter==='all') return allPosts;
-  return allPosts.filter(p=>p.type===activeFilter);
-}
+    // ══ POSTS / LENTA ════════════════════════════════════════════
+    const CAT_LABELS = { muammo: '🔴 Muammo', narkotik: '🚨 Narkotik', kasal: '🏥 Kasal', axlat: '🗑️ Axlat', jinoyat: '⚠️ Jinoyat', boshqa: '💬 Boshqa' };
+    const CAT_COLORS = { muammo: '#EF4444', narkotik: '#374151', kasal: '#3B82F6', axlat: '#22C55E', jinoyat: '#F59E0B', boshqa: '#8B5CF6' };
+    const ROLE_LBL = { rais: 'Mahalla raisi', inspektor: 'Inspektor', aholi: 'Aholi' };
 
-function setFilter(btn){
-  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  activeFilter = btn.dataset.f;
-  renderFeed(filteredPosts());
-}
+    async function loadPosts() {
+      try {
+        let url = myUser?.mahalla_id
+          ? `${API}/api/posts?mahalla_id=${myUser.mahalla_id}`
+          : myLat ? `${API}/api/posts?lat=${myLat}&lng=${myLng}` : null;
+        if (!url) return;
+        allPosts = await (await fetch(url)).json();
+        renderFeed(filteredPosts());
+        renderMapPosts(allPosts);
+        const pend = allPosts.filter(p => p.type === 'muammo' && !p.resolved).length;
+        document.getElementById('hdr-pill').textContent = pend ? `${pend} muammo` : '✅ Tinch';
+        document.getElementById('hdr-pill').style.background = pend ? '#FEE2E2' : '#D1FAE5';
+        document.getElementById('hdr-pill').style.color = pend ? '#DC2626' : '#065F46';
+      } catch (e) { }
+    }
 
-function renderFeed(posts){
-  const el=document.getElementById('feed-list');
-  if(!posts.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div>Hozircha yangilik yo\'q</div></div>';
-    return;
-  }
-  el.innerHTML=posts.map(p=>`
+    function filteredPosts() {
+      if (activeFilter === 'all') return allPosts;
+      return allPosts.filter(p => p.type === activeFilter);
+    }
+
+    function setFilter(btn) {
+      document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      activeFilter = btn.dataset.f;
+      renderFeed(filteredPosts());
+    }
+
+    function renderFeed(posts) {
+      const el = document.getElementById('feed-list');
+      if (!posts.length) {
+        el.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div>Hozircha yangilik yo\'q</div></div>';
+        return;
+      }
+      el.innerHTML = posts.map(p => `
     <div class="post-card">
-      <div class="post-cat-bar" style="background:${CAT_COLORS[p.type]||'#94A3B8'}"></div>
+      <div class="post-cat-bar" style="background:${CAT_COLORS[p.type] || '#94A3B8'}"></div>
       <div class="post-body">
-        <div class="post-badge badge-${p.type}">${CAT_LABELS[p.type]||p.type}</div>
+        <div class="post-badge badge-${p.type}">${CAT_LABELS[p.type] || p.type}</div>
         <div class="post-desc">${esc(p.description)}</div>
-        ${p.photo_path?`<img class="post-img-thumb" src="${p.photo_path}" loading="lazy">`:''}
+        ${p.photo_path ? `<img class="post-img-thumb" src="${p.photo_path}" loading="lazy">` : ''}
         <div class="post-footer">
           <div class="post-author">👤 ${esc(p.full_name)}</div>
-          <span class="post-role pr-${p.role}">${ROLE_LBL[p.role]||p.role}</span>
+          <span class="post-role pr-${p.role}">${ROLE_LBL[p.role] || p.role}</span>
           <button class="btn-like" onclick="likePost(${p.id},this)">❤️ ${p.likes}</button>
-          ${p.type==='muammo'&&!p.resolved&&myUser?.role!=='aholi'?`<button class="btn-hal" onclick="resolvePost(${p.id})">✅ Hal</button>`:''}
-          ${p.resolved?'<span class="resolved-badge">✅ Hal qilindi</span>':''}
+          ${p.type === 'muammo' && !p.resolved && myUser?.role !== 'aholi' ? `<button class="btn-hal" onclick="resolvePost(${p.id})">✅ Hal</button>` : ''}
+          ${p.resolved ? '<span class="resolved-badge">✅ Hal qilindi</span>' : ''}
         </div>
       </div>
     </div>`).join('');
-}
-
-async function likePost(id,btn){
-  if(!CHAT_ID) return toast('⚠️ Telegram orqali kiring');
-  btn.classList.add('liked');
-  await fetch(`${API}/api/posts/${id}/like`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CHAT_ID})}).catch(()=>{});
-  loadPosts();
-}
-
-async function resolvePost(id){
-  await fetch(`${API}/api/posts/${id}/resolve`,{method:'POST'});
-  toast('✅ Hal qilindi!'); loadPosts();
-}
-
-// ══ SIGNAL FORM ═══════════════════════════════════════════════
-function selCat(btn){
-  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('sel'));
-  btn.classList.add('sel');
-  postType = btn.dataset.t;
-  updateImpact();
-}
-
-function openCam(){ document.getElementById('photo-cam').click(); }
-function openGallery(){ document.getElementById('photo-gal').click(); }
-
-function onPhoto(inp){
-  const f=inp.files[0]; if(!f) return;
-  photoFile=f;
-  const r=new FileReader();
-  r.onload=e=>{
-    document.getElementById('preview-img').src=e.target.result;
-    document.getElementById('preview-wrap').style.display='block';
-    document.getElementById('photo-btns').style.display='none';
-    updateImpact();
-  };
-  r.readAsDataURL(f);
-}
-
-function rmPhoto(){
-  photoFile=null;
-  document.getElementById('preview-wrap').style.display='none';
-  document.getElementById('photo-btns').style.display='grid';
-  document.getElementById('photo-cam').value='';
-  document.getElementById('photo-gal').value='';
-  updateImpact();
-}
-
-function updateImpact(){
-  let score=0;
-  const desc=document.getElementById('post-desc')?.value||'';
-  if(myLat) score+=30;
-  if(photoFile) score+=40;
-  if(desc.length>10) score+=20;
-  if(desc.length>50) score+=10;
-  document.getElementById('impact-val').textContent=Math.min(score,100)+'%';
-}
-
-async function submitPost(){
-  if(!CHAT_ID) return toast('⚠️ Telegram orqali kiring!');
-  if(!myUser) return toast('⚠️ Avval ro\'yxatdan o\'ting');
-  const desc=document.getElementById('post-desc').value.trim();
-  if(!desc) return toast('⚠️ Izoh yozing!');
-  if(!myLat||!myLng) return toast('⚠️ GPS topilmadi! Joylashuv qatorini bosing');
-  const btn=document.getElementById('post-btn');
-  btn.disabled=true; btn.textContent='⏳ Yuborilmoqda...';
-  try{
-    const fd=new FormData();
-    fd.append('chat_id',CHAT_ID);
-    fd.append('type',postType);
-    fd.append('description',desc);
-    fd.append('lat',myLat); fd.append('lng',myLng);
-    if(photoFile) fd.append('photo',photoFile);
-    const r=await fetch(`${API}/api/posts`,{method:'POST',body:fd});
-    const d=await r.json();
-    if(d.ok){
-      toast('✅ Signal yuborildi! +5 ball');
-      document.getElementById('post-desc').value='';
-      rmPhoto();
-      loadPosts();
-      goTab('lenta');
-    } else toast('❌ '+(d.error||'Xato'));
-  }catch(e){ toast('❌ Server xatosi'); }
-  finally{ btn.disabled=false; btn.innerHTML='➤ Signal yuborish'; }
-}
-
-// ══ CHAT ══════════════════════════════════════════════════════
-async function loadChatList(){
-  const el=document.getElementById('chat-list-body');
-  el.innerHTML='';
-  const members = myUser?.mahalla_id
-    ? await fetch(`${API}/api/mahalla/members?mahalla_id=${myUser.mahalla_id}`).then(r=>r.json()).catch(()=>[])
-    : [];
-
-  // Guruh
-  const g=document.createElement('div');
-  g.className='chat-item';
-  g.innerHTML=`<div class="chat-av ca-group">🏘️</div><div class="chat-meta"><div class="chat-name2">Mahalla guruhi</div><div class="chat-last2">${members.length} a'zo — umumiy chat</div></div>`;
-  g.onclick=()=>openChatRoom('group',null,'🏘️ Mahalla guruhi',members.length+" a'zo");
-  el.appendChild(g);
-
-  // Kontaktlar va a'zolar
-  if(CHAT_ID&&myUser){
-    const contacts=await fetch(`${API}/api/messages/contacts?chat_id=${CHAT_ID}`).then(r=>r.json()).catch(()=>[]);
-    const shownIds=new Set(contacts.map(c=>c.contact_id));
-    const allContacts=[...contacts,...members.filter(m=>m.id!==myUser.id&&!shownIds.has(m.id)).map(m=>({...m,contact_id:m.id}))];
-    allContacts.forEach(c=>{
-      const item=document.createElement('div');
-      item.className='chat-item';
-      item.innerHTML=`<div class="chat-av ca-user">${(c.full_name||'?')[0].toUpperCase()}</div><div class="chat-meta"><div class="chat-name2">${esc(c.full_name||'Noma\'lum')}</div><div class="chat-last2">${ROLE_LBL[c.role]||c.role||''}</div></div>${c.last_time?`<div class="chat-time2">${fmtTime(c.last_time)}</div>`:''}`;
-      item.onclick=()=>openChatRoom('private',c.contact_id||c.id,c.full_name,ROLE_LBL[c.role]||'');
-      el.appendChild(item);
-    });
-  }
-
-  if(el.children.length===0){
-    el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><div>Mahallangizda hali a\'zo yo\'q</div></div>';
-  }
-}
-
-function openChatRoom(mode,contactId,name,sub){
-  chatMode=mode; chatContactId=contactId;
-  document.getElementById('room-name').textContent=name;
-  document.getElementById('room-sub').textContent=sub||'';
-  document.getElementById('chat-list-wrap').classList.add('hide');
-  document.getElementById('chat-room-wrap').classList.add('on');
-  loadMsgs();
-  clearInterval(chatPoll);
-  chatPoll=setInterval(loadMsgs,2500);
-}
-
-function backToList(){
-  clearInterval(chatPoll);
-  document.getElementById('chat-room-wrap').classList.remove('on');
-  document.getElementById('chat-list-wrap').classList.remove('hide');
-}
-
-async function loadMsgs(){
-  if(!myUser) return;
-  let msgs=[];
-  try{
-    if(chatMode==='group'){
-      const r=await fetch(`${API}/api/messages/group?mahalla_id=${myUser.mahalla_id}`);
-      if(r.ok) msgs=await r.json();
-    } else {
-      const r=await fetch(`${API}/api/messages/private?chat_id=${CHAT_ID}&contact_id=${chatContactId}`);
-      if(r.ok) msgs=await r.json();
     }
-  }catch(e){ return; }
-  const wrap=document.getElementById('msgs-wrap');
-  const atBot=wrap.scrollHeight-wrap.scrollTop-wrap.clientHeight<80;
-  if(!Array.isArray(msgs)) return;
-  wrap.innerHTML=msgs.map(m=>{
-    const mine=m.from_user_id===myUser?.id;
-    return `<div class="msg-b ${mine?'msg-out':'msg-in'}">
-      ${!mine&&chatMode==='group'?`<div class="msg-sndr">${esc(m.full_name||'')}</div>`:''}
-      ${esc(m.text||'')}
+
+    async function likePost(id, btn) {
+      if (!CHAT_ID) return toast('⚠️ Telegram orqali kiring');
+      btn.classList.add('liked');
+      await fetch(`${API}/api/posts/${id}/like`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: CHAT_ID }) }).catch(() => { });
+      loadPosts();
+    }
+
+    async function resolvePost(id) {
+      await fetch(`${API}/api/posts/${id}/resolve`, { method: 'POST' });
+      toast('✅ Hal qilindi!'); loadPosts();
+    }
+
+    // ══ SIGNAL FORM ═══════════════════════════════════════════════
+    function selCat(btn) {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      postType = btn.dataset.t;
+      updateImpact();
+    }
+
+    function openCam() { document.getElementById('photo-cam').click(); }
+    function openGallery() { document.getElementById('photo-gal').click(); }
+
+    function onPhoto(inp) {
+      const f = inp.files[0]; if (!f) return;
+      photoFile = f;
+      const r = new FileReader();
+      r.onload = e => {
+        document.getElementById('preview-img').src = e.target.result;
+        document.getElementById('preview-wrap').style.display = 'block';
+        document.getElementById('photo-btns').style.display = 'none';
+        updateImpact();
+      };
+      r.readAsDataURL(f);
+    }
+
+    function rmPhoto() {
+      photoFile = null;
+      document.getElementById('preview-wrap').style.display = 'none';
+      document.getElementById('photo-btns').style.display = 'grid';
+      document.getElementById('photo-cam').value = '';
+      document.getElementById('photo-gal').value = '';
+      updateImpact();
+    }
+
+    function updateImpact() {
+      let score = 0;
+      const desc = document.getElementById('post-desc')?.value || '';
+      if (myLat) score += 30;
+      if (photoFile) score += 40;
+      if (desc.length > 10) score += 20;
+      if (desc.length > 50) score += 10;
+      document.getElementById('impact-val').textContent = Math.min(score, 100) + '%';
+    }
+
+    async function submitPost() {
+      if (!CHAT_ID) return toast('⚠️ Telegram orqali kiring!');
+      if (!myUser) return toast('⚠️ Avval ro\'yxatdan o\'ting');
+      const desc = document.getElementById('post-desc').value.trim();
+      if (!desc) return toast('⚠️ Izoh yozing!');
+      if (!myLat || !myLng) return toast('⚠️ GPS topilmadi! Joylashuv qatorini bosing');
+      const btn = document.getElementById('post-btn');
+      btn.disabled = true; btn.textContent = '⏳ Yuborilmoqda...';
+      try {
+        const fd = new FormData();
+        fd.append('chat_id', CHAT_ID);
+        fd.append('type', postType);
+        fd.append('description', desc);
+        fd.append('lat', myLat); fd.append('lng', myLng);
+        if (photoFile) fd.append('photo', photoFile);
+        const r = await fetch(`${API}/api/posts`, { method: 'POST', body: fd });
+        const d = await r.json();
+        if (d.ok) {
+          toast('✅ Signal yuborildi! +5 ball');
+          document.getElementById('post-desc').value = '';
+          rmPhoto();
+          loadPosts();
+          goTab('lenta');
+        } else toast('❌ ' + (d.error || 'Xato'));
+      } catch (e) { toast('❌ Server xatosi'); }
+      finally { btn.disabled = false; btn.innerHTML = '➤ Signal yuborish'; }
+    }
+
+    // ══ CHAT ══════════════════════════════════════════════════════
+    async function loadChatList() {
+      const el = document.getElementById('chat-list-body');
+      el.innerHTML = '';
+      const members = myUser?.mahalla_id
+        ? await fetch(`${API}/api/mahalla/members?mahalla_id=${myUser.mahalla_id}`).then(r => r.json()).catch(() => [])
+        : [];
+
+      // Guruh
+      const g = document.createElement('div');
+      g.className = 'chat-item';
+      g.innerHTML = `<div class="chat-av ca-group">🏘️</div><div class="chat-meta"><div class="chat-name2">Mahalla guruhi</div><div class="chat-last2">${members.length} a'zo — umumiy chat</div></div>`;
+      g.onclick = () => openChatRoom('group', null, '🏘️ Mahalla guruhi', members.length + " a'zo");
+      el.appendChild(g);
+
+      // Kontaktlar va a'zolar
+      if (CHAT_ID && myUser) {
+        const contacts = await fetch(`${API}/api/messages/contacts?chat_id=${CHAT_ID}`).then(r => r.json()).catch(() => []);
+        const shownIds = new Set(contacts.map(c => c.contact_id));
+        const allContacts = [...contacts, ...members.filter(m => m.id !== myUser.id && !shownIds.has(m.id)).map(m => ({ ...m, contact_id: m.id }))];
+        allContacts.forEach(c => {
+          const item = document.createElement('div');
+          item.className = 'chat-item';
+          item.innerHTML = `<div class="chat-av ca-user">${(c.full_name || '?')[0].toUpperCase()}</div><div class="chat-meta"><div class="chat-name2">${esc(c.full_name || 'Noma\'lum')}</div><div class="chat-last2">${ROLE_LBL[c.role] || c.role || ''}</div></div>${c.last_time ? `<div class="chat-time2">${fmtTime(c.last_time)}</div>` : ''}`;
+          item.onclick = () => openChatRoom('private', c.contact_id || c.id, c.full_name, ROLE_LBL[c.role] || '');
+          el.appendChild(item);
+        });
+      }
+
+      if (el.children.length === 0) {
+        el.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><div>Mahallangizda hali a\'zo yo\'q</div></div>';
+      }
+    }
+
+    function openChatRoom(mode, contactId, name, sub) {
+      chatMode = mode; chatContactId = contactId;
+      document.getElementById('room-name').textContent = name;
+      document.getElementById('room-sub').textContent = sub || '';
+      document.getElementById('chat-list-wrap').classList.add('hide');
+      document.getElementById('chat-room-wrap').classList.add('on');
+      loadMsgs();
+      clearInterval(chatPoll);
+      chatPoll = setInterval(loadMsgs, 2500);
+    }
+
+    function backToList() {
+      clearInterval(chatPoll);
+      document.getElementById('chat-room-wrap').classList.remove('on');
+      document.getElementById('chat-list-wrap').classList.remove('hide');
+    }
+
+    async function loadMsgs() {
+      if (!myUser) return;
+      let msgs = [];
+      try {
+        if (chatMode === 'group') {
+          const r = await fetch(`${API}/api/messages/group?mahalla_id=${myUser.mahalla_id}`);
+          if (r.ok) msgs = await r.json();
+        } else {
+          const r = await fetch(`${API}/api/messages/private?chat_id=${CHAT_ID}&contact_id=${chatContactId}`);
+          if (r.ok) msgs = await r.json();
+        }
+      } catch (e) { return; }
+      const wrap = document.getElementById('msgs-wrap');
+      const atBot = wrap.scrollHeight - wrap.scrollTop - wrap.clientHeight < 80;
+      if (!Array.isArray(msgs)) return;
+      wrap.innerHTML = msgs.map(m => {
+        const mine = m.from_user_id === myUser?.id;
+        return `<div class="msg-b ${mine ? 'msg-out' : 'msg-in'}">
+      ${!mine && chatMode === 'group' ? `<div class="msg-sndr">${esc(m.full_name || '')}</div>` : ''}
+      ${esc(m.text || '')}
       <div class="msg-t">${fmtTime(m.created_at)}</div>
     </div>`;
-  }).join('');
-  if(atBot||msgs.length<4) wrap.scrollTop=wrap.scrollHeight;
-}
-
-async function sendMsg(){
-  const inp=document.getElementById('msg-inp');
-  const text=inp.value.trim();
-  if(!text) return;
-  if(!CHAT_ID) return toast('⚠️ Telegram orqali kiring');
-  if(!myUser) return toast('⚠️ Avval ro\'yxatdan o\'ting');
-  inp.value='';
-  try{
-    if(chatMode==='group'){
-      await fetch(`${API}/api/messages/group`,{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({chat_id:CHAT_ID,text})
-      });
-    } else {
-      await fetch(`${API}/api/messages/private`,{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({chat_id:CHAT_ID,to_user_id:chatContactId,text})
-      });
+      }).join('');
+      if (atBot || msgs.length < 4) wrap.scrollTop = wrap.scrollHeight;
     }
-    await loadMsgs();
-  }catch(e){ toast('❌ Xabar ketmadi'); }
-}
 
-// ══ TAHLIL ════════════════════════════════════════════════════
-async function loadStats(){
-  if(!myUser?.mahalla_id) return;
-  try{
-    const d=await(await fetch(`${API}/api/stats?mahalla_id=${myUser.mahalla_id}`)).json();
-    const members=await(await fetch(`${API}/api/mahalla/members?mahalla_id=${myUser.mahalla_id}`)).json().catch(()=>[]);
-    document.getElementById('s-total').textContent=d.total||0;
-    document.getElementById('s-pend').textContent=d.pending||0;
-    document.getElementById('s-res').textContent=d.resolved||0;
-    document.getElementById('s-mem').textContent=members.length||0;
-    document.getElementById('my-score').textContent=myUser.score||0;
-    const rank=d.top_users?.findIndex(u=>u.full_name===myUser.full_name);
-    document.getElementById('my-rank').textContent=rank>=0?`Mahallada ${rank+1}-o'rin`:"Hali reyting yo'q";
+    async function sendMsg() {
+      const inp = document.getElementById('msg-inp');
+      const text = inp.value.trim();
+      if (!text) return;
+      if (!CHAT_ID) return toast('⚠️ Telegram orqali kiring');
+      if (!myUser) return toast('⚠️ Avval ro\'yxatdan o\'ting');
+      inp.value = '';
+      try {
+        if (chatMode === 'group') {
+          await fetch(`${API}/api/messages/group`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: CHAT_ID, text })
+          });
+        } else {
+          await fetch(`${API}/api/messages/private`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: CHAT_ID, to_user_id: chatContactId, text })
+          });
+        }
+        await loadMsgs();
+      } catch (e) { toast('❌ Xabar ketmadi'); }
+    }
 
-    // Kategoriyalar statistika
-    const cats=['muammo','narkotik','kasal','axlat','jinoyat','boshqa'];
-    const catCounts={};
-    allPosts.forEach(p=>{ catCounts[p.type]=(catCounts[p.type]||0)+1; });
-    const maxC=Math.max(1,...Object.values(catCounts));
-    document.getElementById('cat-stats').innerHTML=cats.map(c=>`
+    // ══ TAHLIL ════════════════════════════════════════════════════
+    async function loadStats() {
+      if (!myUser?.mahalla_id) return;
+      try {
+        const d = await (await fetch(`${API}/api/stats?mahalla_id=${myUser.mahalla_id}`)).json();
+        const members = await (await fetch(`${API}/api/mahalla/members?mahalla_id=${myUser.mahalla_id}`)).json().catch(() => []);
+        document.getElementById('s-total').textContent = d.total || 0;
+        document.getElementById('s-pend').textContent = d.pending || 0;
+        document.getElementById('s-res').textContent = d.resolved || 0;
+        document.getElementById('s-mem').textContent = members.length || 0;
+        document.getElementById('my-score').textContent = myUser.score || 0;
+        const rank = d.top_users?.findIndex(u => u.full_name === myUser.full_name);
+        document.getElementById('my-rank').textContent = rank >= 0 ? `Mahallada ${rank + 1}-o'rin` : "Hali reyting yo'q";
+
+        // Kategoriyalar statistika
+        const cats = ['muammo', 'narkotik', 'kasal', 'axlat', 'jinoyat', 'boshqa'];
+        const catCounts = {};
+        allPosts.forEach(p => { catCounts[p.type] = (catCounts[p.type] || 0) + 1; });
+        const maxC = Math.max(1, ...Object.values(catCounts));
+        document.getElementById('cat-stats').innerHTML = cats.map(c => `
       <div class="cs-row">
-        <div class="cs-icon">${CAT_LABELS[c]?.split(' ')[0]||'📌'}</div>
-        <div class="cs-label">${CAT_LABELS[c]?.split(' ').slice(1).join(' ')||c}</div>
-        <div class="cs-bar-wrap"><div class="cs-bar" style="width:${Math.round(((catCounts[c]||0)/maxC)*100)}%;background:${CAT_COLORS[c]}"></div></div>
-        <div class="cs-count">${catCounts[c]||0}</div>
+        <div class="cs-icon">${CAT_LABELS[c]?.split(' ')[0] || '📌'}</div>
+        <div class="cs-label">${CAT_LABELS[c]?.split(' ').slice(1).join(' ') || c}</div>
+        <div class="cs-bar-wrap"><div class="cs-bar" style="width:${Math.round(((catCounts[c] || 0) / maxC) * 100)}%;background:${CAT_COLORS[c]}"></div></div>
+        <div class="cs-count">${catCounts[c] || 0}</div>
       </div>`).join('');
 
-    // Reyting
-    const rc=['lb-1','lb-2','lb-3'];
-    document.getElementById('leaderboard').innerHTML=d.top_users?.length
-      ?d.top_users.map((u,i)=>`
+        // Reyting
+        const rc = ['lb-1', 'lb-2', 'lb-3'];
+        document.getElementById('leaderboard').innerHTML = d.top_users?.length
+          ? d.top_users.map((u, i) => `
         <div class="lb-item">
-          <div class="lb-badge ${rc[i]||'lb-n'}">${i+1}</div>
-          <div class="lb-name2">${esc(u.full_name)} <span style="font-size:11px;color:var(--text2)">(${u.role||''})</span></div>
+          <div class="lb-badge ${rc[i] || 'lb-n'}">${i + 1}</div>
+          <div class="lb-name2">${esc(u.full_name)} <span style="font-size:11px;color:var(--text2)">(${u.role || ''})</span></div>
           <div class="lb-score2">⭐ ${u.score}</div>
         </div>`).join('')
-      :'<div class="empty"><div class="empty-icon">🌟</div><div>Hali hech kim yo\'q</div></div>';
-  }catch(e){}
-}
+          : '<div class="empty"><div class="empty-icon">🌟</div><div>Hali hech kim yo\'q</div></div>';
+      } catch (e) { }
+    }
 
-// ══ TABS ══════════════════════════════════════════════════════
-const TABS=['map','lenta','signal','chat','tahlil'];
-function goTab(name){
-  curTab=name;
-  TABS.forEach(t=>{
-    const el=document.getElementById('tab-'+t);
-    const btn=document.getElementById('n-'+t);
-    if(el) el.classList.toggle('on',t===name);
-    if(btn) btn.classList.toggle('on',t===name);
-  });
-  // Signal tugmasi har doim o'z rangida
-  document.getElementById('n-signal').classList.remove('on');
-  if(name==='signal') document.getElementById('n-signal').style.opacity='1';
+    // ══ TABS ══════════════════════════════════════════════════════
+    const TABS = ['map', 'lenta', 'signal', 'chat', 'tahlil'];
+    function goTab(name) {
+      curTab = name;
+      TABS.forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        const btn = document.getElementById('n-' + t);
+        if (el) el.classList.toggle('on', t === name);
+        if (btn) btn.classList.toggle('on', t === name);
+      });
+      // Signal tugmasi har doim o'z rangida
+      document.getElementById('n-signal').classList.remove('on');
+      if (name === 'signal') document.getElementById('n-signal').style.opacity = '1';
 
-  if(name==='tahlil'){ loadStats(); }
-  if(name==='chat'){ loadChatList(); backToList(); }
-  if(name==='lenta'){ loadPosts(); }
-  if(name==='map'){ loadPosts(); }
-}
+      if (name === 'tahlil') { loadStats(); }
+      if (name === 'chat') { loadChatList(); backToList(); }
+      if (name === 'lenta') { loadPosts(); }
+      if (name === 'map') { loadPosts(); }
+    }
 
-// ══ UTILS ═════════════════════════════════════════════════════
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),3000); }
-function esc(s){ if(!s) return ''; const d=document.createElement('div'); d.textContent=String(s); return d.innerHTML; }
-function fmtDate(d){ if(!d) return ''; return new Date(d).toLocaleDateString('uz-UZ',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
-function fmtTime(d){ if(!d) return ''; const t=new Date(d),now=new Date(); return t.toDateString()===now.toDateString()?t.toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'}):t.toLocaleDateString('uz-UZ',{day:'2-digit',month:'2-digit'}); }
-</script>
+    // ══ UTILS ═════════════════════════════════════════════════════
+    function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on'); setTimeout(() => t.classList.remove('on'), 3000); }
+    function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
+    function fmtDate(d) { if (!d) return ''; return new Date(d).toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); }
+    function fmtTime(d) { if (!d) return ''; const t = new Date(d), now = new Date(); return t.toDateString() === now.toDateString() ? t.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }) : t.toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit' }); }
+  </script>
 </body>
+
 </html>
