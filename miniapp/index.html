@@ -333,36 +333,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 const tg = window.Telegram && window.Telegram.WebApp;
 if(tg){ try{ tg.expand(); tg.ready(); }catch(e){} }
 
-// CHAT_ID — barcha usullar
+// CHAT_ID olish
     let CHAT_ID = null;
-    (function () {
-      try {
-        // 1. initDataUnsafe — eng ishonchli
-        if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
-          CHAT_ID = String(tg.initDataUnsafe.user.id); return;
+    (function(){
+      try{
+        // 1. URL ?uid= (bot yuboradi - eng ishonchli)
+        const uid = new URLSearchParams(window.location.search).get('uid');
+        if(uid && /^\d+$/.test(uid)){ CHAT_ID=uid; return; }
+        // 2. URL ?start=
+        const st = new URLSearchParams(window.location.search).get('start');
+        if(st && /^\d+$/.test(st)){ CHAT_ID=st; return; }
+        // 3. tg.initDataUnsafe (mobil)
+        if(tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id){
+          CHAT_ID=String(tg.initDataUnsafe.user.id); return;
         }
-        // 2. initData parse
-        if (tg && tg.initData && tg.initData.length > 0) {
-          try {
-            const p = new URLSearchParams(tg.initData);
-            const uStr = p.get('user');
-            if (uStr) { const u = JSON.parse(uStr); if (u.id) { CHAT_ID = String(u.id); return; } }
-          } catch(ex) {}
+        // 4. initData parse
+        if(tg && tg.initData){
+          try{
+            const p=new URLSearchParams(tg.initData);
+            const u=JSON.parse(p.get('user')||'{}');
+            if(u.id){ CHAT_ID=String(u.id); return; }
+          }catch(e2){}
         }
-        // 3. URL ?start=
-        const us = new URLSearchParams(window.location.search).get('start');
-        if (us && /^\d+$/.test(us)) { CHAT_ID = us; return; }
-        // 4. start_param
-        if (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
-          const sp = String(tg.initDataUnsafe.start_param);
-          if (/^\d+$/.test(sp)) { CHAT_ID = sp; return; }
-        }
-        // 5. URL hash
-        const hsh = window.location.hash.replace('#','');
-        if (hsh && /^\d+$/.test(hsh)) { CHAT_ID = hsh; return; }
-      } catch (e) { console.warn('CHAT_ID xato:', e); }
+      }catch(e){ console.warn('CHAT_ID xato:',e); }
     })();
-    console.log('CHAT_ID natija:', CHAT_ID);
+    console.log('CHAT_ID:', CHAT_ID, window.location.search);
 
 const API = '';
 let myLat=null, myLng=null, myUser=null;
