@@ -1648,7 +1648,7 @@
           (p.photo_path ? '<img class="pcard-media" src="' + p.photo_path + '" loading="lazy" onerror="this.style.display=\'none\'">' : '') +
           // TAVSIF
           '<div class="pcard-body">' +
-          '<div class="pcard-desc" id="desc-' + p.id + '">' + shortDesc + (hasMore ? '<span class="pcard-desc-more" onclick="expandDesc(' + p.id + ',''+desc.replace(/' / g, "\'") + '') " > ...ko\'proq</span>':'')+'</div>'+
+          '<div class="pcard-desc" id="desc-' + p.id + '">' + shortDesc + (hasMore ? '<span class="pcard-desc-more" onclick=\'expandDesc(' + p.id + ',' + JSON.stringify(desc) + ')\' > ...ko\'proq</span>':'')+'</div>'+
       '</div>' +
         // ACTIONS
         '<div class="pcard-actions">' +
