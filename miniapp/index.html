@@ -417,20 +417,45 @@ function showBanner(){
 
 // ═══ GPS ══════════════════════════════════════════════════════
 function startGPS(){
-  if(!navigator.geolocation){ setGPS('er','GPS yo\'q'); return; }
   setGPS('w','Aniqlanmoqda...');
-  navigator.geolocation.getCurrentPosition(
-    function(p){
-      myLat=p.coords.latitude; myLng=p.coords.longitude;
-      setGPS('ok',myLat.toFixed(5)+', '+myLng.toFixed(5));
-      document.getElementById('gps-sub').textContent='✅ Aniqlandi';
-      updateLoc();
-      if(myMap){ try{ myMap.setCenter([myLat,myLng],15); }catch(e){} }
-    },
-    function(){ setGPS('er','Topilmadi — bosing'); },
-    {enableHighAccuracy:true,timeout:10000,maximumAge:60000}
-  );
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      function(p){
+        myLat=p.coords.latitude; myLng=p.coords.longitude;
+        setGPS('ok',myLat.toFixed(5)+', '+myLng.toFixed(5));
+        document.getElementById('gps-sub').textContent='✅ Aniqlandi';
+        updateLoc();
+        if(myMap){ try{ myMap.setCenter([myLat,myLng],15); }catch(e){} }
+      },
+      function(err){
+        // GPS ishlamasa Yandex Geolocation API orqali urinib ko'r
+        ymapsGPS();
+      },
+      {enableHighAccuracy:true,timeout:8000,maximumAge:30000}
+    );
+  } else {
+    ymapsGPS();
+  }
 }
+
+function ymapsGPS(){
+  if(typeof ymaps==='undefined'){ setGPS('er','GPS topilmadi — bosing'); return; }
+  ymaps.ready(function(){
+    ymaps.geolocation.get({provider:'browser',mapStateAutoApply:false}).then(function(res){
+      var coords=res.geoObjects.position;
+      if(coords&&coords[0]){
+        myLat=coords[0]; myLng=coords[1];
+        setGPS('ok',myLat.toFixed(5)+', '+myLng.toFixed(5));
+        document.getElementById('gps-sub').textContent='✅ Aniqlandi';
+        updateLoc();
+        if(myMap) myMap.setCenter([myLat,myLng],15);
+      } else {
+        setGPS('er','GPS topilmadi — bosing');
+      }
+    }).catch(function(){ setGPS('er','GPS topilmadi — bosing'); });
+  });
+}
+
 function retryGPS(){ startGPS(); }
 function setGPS(s,t){
   const dot=document.getElementById('gps-dot');
@@ -472,7 +497,9 @@ function initMap(){
   try{
     ymaps.ready(function(){
       try{
-        myMap=new ymaps.Map('ymap',{center:center,zoom:15,controls:['zoomControl','geolocationControl']},{suppressMapOpenBlock:true});
+        myMap=new ymaps.Map('ymap',{center:center,zoom:myLat?15:11,controls:['zoomControl','geolocationControl']},{suppressMapOpenBlock:true});
+        // Xarita ochilganda GPS ni sinab ko'r
+        if(!myLat) startGPS();
       }catch(e){ showMapError(); }
     });
   }catch(e){ showMapError(); }
@@ -512,8 +539,8 @@ async function loadPosts(){
     var url;
     if(myUser&&myUser.mahalla_id) url=API+'/api/posts?mahalla_id='+myUser.mahalla_id;
     else if(myLat) url=API+'/api/posts?lat='+myLat+'&lng='+myLng;
-    else return;
-    var r=await fetch(url);
+    else url=API+'/api/posts?lat=41.2995&lng=69.2401'; // default Toshkent
+    var r=await fetch(url,{cache:'no-store'});
     if(!r.ok) return;
     allPosts=await r.json();
     if(!Array.isArray(allPosts)) allPosts=[];
@@ -595,8 +622,8 @@ function rmPhoto(){
   photoFile=null;
   document.getElementById('prev-wrap').style.display='none';
   document.getElementById('photo-btns').style.display='grid';
-  document.getElementById('pic-cam').value='';
-  document.getElementById('pic-gal').value='';
+  var f=document.getElementById('pic-file');
+  if(f) f.value='';
 }
 async function submitPost(){
   if(!CHAT_ID) return toast('⚠️ Telegram orqali kiring!');
@@ -626,34 +653,51 @@ async function submitPost(){
 
 // ═══ CHAT ═════════════════════════════════════════════════════
 async function loadChatList(){
-  var el=document.getElementById('clist'); el.innerHTML='';
+  var el=document.getElementById('clist');
+  el.innerHTML='<div style="text-align:center;padding:20px;color:var(--tx2);font-size:13px">⏳ Yuklanmoqda...</div>';
   var members=[];
   if(myUser&&myUser.mahalla_id){
-    try{ var r=await fetch(API+'/api/mahalla/members?mahalla_id='+myUser.mahalla_id); if(r.ok) members=await r.json(); }catch(e){}
-  }
-  var g=document.createElement('div'); g.className='citem';
-  g.innerHTML='<div class="cav cav-g">🏘️</div><div class="cmeta"><div class="cname">Mahalla guruhi</div><div class="clast">'+members.length+" a'zo — umumiy chat</div></div>";
-  g.onclick=function(){openRoom('group',null,'🏘️ Mahalla guruhi',members.length+" a'zo");};
-  el.appendChild(g);
-  if(CHAT_ID&&myUser){
     try{
-      var cr=await fetch(API+'/api/messages/contacts?chat_id='+CHAT_ID); 
-      var contacts=cr.ok?await cr.json():[];
-      var shownIds=new Set(contacts.map(function(c){return c.contact_id;}));
-      var all2=contacts.concat(members.filter(function(m){return m.id!==myUser.id&&!shownIds.has(m.id);}));
-      all2.forEach(function(c){
-        var item=document.createElement('div'); item.className='citem';
-        item.innerHTML='<div class="cav cav-u">'+(c.full_name||'?')[0].toUpperCase()+'</div>'+
-          '<div class="cmeta"><div class="cname">'+esc(c.full_name||'Noma\'lum')+'</div>'+
-          '<div class="clast">'+(ROLE_LBL[c.role]||c.role||'')+'</div></div>'+
-          (c.last_time?'<div class="ctime">'+fmtTime(c.last_time)+'</div>':'');
-        var cid2=c.contact_id||c.id;
-        item.onclick=function(){openRoom('private',cid2,c.full_name,ROLE_LBL[c.role]||'');};
-        el.appendChild(item);
-      });
+      var r=await fetch(API+'/api/mahalla/members?mahalla_id='+myUser.mahalla_id,{cache:'no-store'});
+      if(r.ok) members=await r.json();
     }catch(e){}
   }
+  el.innerHTML='';
+
+  // Mahalla guruhi
+  var g=document.createElement('div'); g.className='citem';
+  g.innerHTML='<div class="cav cav-g">🏘️</div>'+
+    '<div class="cmeta"><div class="cname">🏘️ Mahalla guruhi</div>'+
+    '<div class="clast">'+members.length+" a'zo · umumiy chat</div></div>";
+  g.onclick=function(){openRoom('group',null,'🏘️ Mahalla guruhi',members.length+" a'zo");};
+  el.appendChild(g);
+
+  // A'zolar bo'luvchi
+  if(members.length>1){
+    var dv=document.createElement('div');
+    dv.style.cssText='padding:7px 14px 3px;font-size:11px;font-weight:700;color:var(--tx2);background:var(--bg);text-transform:uppercase;letter-spacing:.5px';
+    dv.textContent="A'zolar ("+members.length+")";
+    el.appendChild(dv);
+  }
+
+  // Har bir a'zo
+  members.forEach(function(m){
+    if(String(m.chat_id)===String(CHAT_ID)) return;
+    var item=document.createElement('div'); item.className='citem';
+    var ini=(m.full_name||'?').split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
+    item.innerHTML='<div class="cav cav-u" style="font-size:13px;font-weight:800">'+ini+'</div>'+
+      '<div class="cmeta"><div class="cname">'+esc(m.full_name||'—')+'</div>'+
+      '<div class="clast">'+(ROLE_LBL[m.role]||m.role||'')+'</div></div>';
+    var mid=m.id;
+    item.onclick=function(){openRoom('private',mid,m.full_name,ROLE_LBL[m.role]||'');};
+    el.appendChild(item);
+  });
+
+  if(el.children.length===0){
+    el.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--tx2);font-size:13px">Hali a'zo yo'q</div>';
+  }
 }
+
 
 function openRoom(mode,cid,name,sub){
   chatMode=mode; chatCid=cid;

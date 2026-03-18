@@ -64,9 +64,14 @@ app.get('/api/posts', async (req, res) => {
   const { mahalla_id, lat, lng } = req.query;
   try {
     let posts;
-    if (mahalla_id) posts = await postDB.getByMahalla(mahalla_id);
-    else if (lat && lng) posts = await postDB.getNearby(parseFloat(lat), parseFloat(lng), 3000);
-    else return res.status(400).json({ error: 'mahalla_id yoki koordinat kerak' });
+    if (mahalla_id) {
+      // Faqat shu mahalla + 3km atrofdagilarni ham ko'rsin
+      posts = await postDB.getAllNearMahalla(mahalla_id);
+    } else if (lat && lng) {
+      posts = await postDB.getNearby(parseFloat(lat), parseFloat(lng), 5000);
+    } else {
+      posts = await postDB.getAll();
+    }
     res.json(posts);
   } catch(e) { res.status(500).json({ error: e.message }); }
 });

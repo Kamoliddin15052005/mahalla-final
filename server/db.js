@@ -102,6 +102,21 @@ const postDB = {
       return true;
     }catch{return false;}
   },
+  getAll: async () => {
+    const r = await pool.query(
+      `SELECT p.*,u.full_name,u.role FROM posts p JOIN users u ON p.user_id=u.id ORDER BY p.created_at DESC LIMIT 100`
+    );
+    return r.rows;
+  },
+
+  getAllNearMahalla: async (mahalla_id) => {
+    // Shu mahalla + barcha mahallalar (hozircha barcha postlarni ko'rsatamiz)
+    const r = await pool.query(
+      `SELECT p.*,u.full_name,u.role FROM posts p JOIN users u ON p.user_id=u.id ORDER BY p.created_at DESC LIMIT 100`
+    );
+    return r.rows;
+  },
+
   getStats: async (mid) => {
     const [t,m,res,toy]=await Promise.all([
       q1('SELECT COUNT(*) c FROM posts WHERE mahalla_id=$1',[mid]),
