@@ -71,14 +71,16 @@
 
     @keyframes fadeout {
       0% {
-        opacity: 1;
-        pointer-events: all
+        opacity: 1
+      }
+
+      99% {
+        opacity: 0
       }
 
       100% {
         opacity: 0;
-        pointer-events: none;
-        display: none
+        visibility: hidden
       }
     }
 
@@ -1234,7 +1236,7 @@
 
 <body>
 
-  <div id="loading" style="animation:fadeout 0.8s 1s forwards">
+  <div id="loading">
     <div style="font-size:48px">🏘️</div>
     <div class="spin"></div>
     <p>Mahalla Bot yuklanmoqda...</p>
@@ -1530,7 +1532,8 @@
       }
     } catch (e) { console.warn('CHAT_ID xato:', e); }
 
-    console.log('FINAL CHAT_ID:', CHAT_ID, 'URL:', window.location.href); ser = null;
+    console.log('FINAL CHAT_ID:', CHAT_ID, 'URL:', window.location.href);
+    let ser = null;
     let myMap = null, postType = 'muammo', photoFile = null;
     let curTab = 'map', chatMode = 'group', chatContactId = null;
     let chatPoll = null, allPosts = [], activeFilter = 'all';
@@ -1540,11 +1543,11 @@
       // Loading ekranini DARHOL yashiramiz
       const hideLoading = () => {
         const el = document.getElementById('loading');
-        if (el) el.style.display = 'none';
+        if (el) { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => { el.style.display = 'none'; }, 300); }
       };
 
-      // 1 soniyadan keyin majburiy yashir
-      setTimeout(hideLoading, 1000);
+      // 800ms dan keyin MAJBURIY yashir
+      setTimeout(hideLoading, 800);
 
       // Parallel yuklaymiz
       loadUser().finally(hideLoading);
