@@ -11,6 +11,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
+// Barcha API javoblarida cache o'chirilgan
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'miniapp')));
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
@@ -28,9 +35,6 @@ const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 // ─── USER ────────────────────────────────────────────────────
 app.get('/api/user/:chat_id', (req, res) => {
-  // 304 bo'lmasin
-  res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-  res.set('Pragma', 'no-cache');
   const user = userDB.findByChatId(parseInt(req.params.chat_id));
   if (!user) return res.status(404).json({ error: 'Topilmadi' });
   res.json(user);

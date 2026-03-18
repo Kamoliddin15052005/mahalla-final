@@ -19,7 +19,8 @@ const BASE_URL = process.env.MINIAPP_URL || 'http://localhost:3000';
 
 // chatId ni URL hash ga qo'shamiz — Telegram WebApp hash ni o'tkazadi
 function getMiniAppUrl(chatId) {
-  return `${BASE_URL}?uid=${chatId}`;
+  const ts = Date.now();
+  return `${BASE_URL}?uid=${chatId}&t=${ts}`;
 }
 
 // ─── /start ──────────────────────────────────────────────────
