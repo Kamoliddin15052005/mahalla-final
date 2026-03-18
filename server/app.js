@@ -28,6 +28,9 @@ const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 // ─── USER ────────────────────────────────────────────────────
 app.get('/api/user/:chat_id', (req, res) => {
+  // 304 bo'lmasin
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.set('Pragma', 'no-cache');
   const user = userDB.findByChatId(parseInt(req.params.chat_id));
   if (!user) return res.status(404).json({ error: 'Topilmadi' });
   res.json(user);
