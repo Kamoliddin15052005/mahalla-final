@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <title>Mahalla Bot</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -15,162 +15,82 @@
     }
 
     :root {
+      --bl: #4F6EF7;
+      --bl2: #3B5BDB;
+      --gr: #22C55E;
+      --rd: #EF4444;
+      --or: #F97316;
+      --pu: #8B5CF6;
+      --te: #14B8A6;
       --bg: #F0F4F8;
-      --white: #ffffff;
-      --card: #ffffff;
-      --blue: #4F6EF7;
-      --blue2: #3B5BDB;
-      --green: #22C55E;
-      --red: #EF4444;
-      --orange: #F97316;
-      --purple: #8B5CF6;
-      --teal: #14B8A6;
-      --gray: #94A3B8;
-      --text: #1E293B;
-      --text2: #64748B;
-      --border: #E2E8F0;
-      --nav-h: 68px;
-      --hdr-h: 58px;
+      --wh: #fff;
+      --bdr: #E2E8F0;
+      --tx: #1E293B;
+      --tx2: #64748B;
+      --gy: #94A3B8;
+      --nh: 60px;
+      --hh: 54px;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg);
-      color: var(--text);
+      color: var(--tx);
       height: 100vh;
       overflow: hidden
     }
 
-    /* ── LOADING ── */
-    #loading {
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(135deg, #4F6EF7, #8B5CF6);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      z-index: 9999
-    }
-
-    #loading .spin {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255, 255, 255, .3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin .7s linear infinite
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg)
-      }
-    }
-
-    @keyframes fadeout {
-      0% {
-        opacity: 1
-      }
-
-      99% {
-        opacity: 0
-      }
-
-      100% {
-        opacity: 0;
-        visibility: hidden
-      }
-    }
-
-    #loading p {
-      color: rgba(255, 255, 255, .8);
-      font-size: 13px
-    }
-
-    /* ── TOAST ── */
-    .toast {
-      position: fixed;
-      top: 70px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-6px);
-      background: #1E293B;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 24px;
-      font-size: 13px;
-      font-weight: 500;
-      opacity: 0;
-      pointer-events: none;
-      transition: all .25s;
-      z-index: 9998;
-      white-space: nowrap
-    }
-
-    .toast.on {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0)
-    }
-
-    /* ── HEADER ── */
+    /* HEADER */
     .hdr {
-      height: var(--hdr-h);
-      background: var(--white);
+      height: var(--hh);
+      background: var(--wh);
+      border-bottom: 1px solid var(--bdr);
       display: flex;
       align-items: center;
-      padding: 0 16px;
+      padding: 0 14px;
       gap: 10px;
-      border-bottom: 1px solid var(--border);
       position: relative;
       z-index: 50
     }
 
-    .hdr-logo {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, #4F6EF7, #8B5CF6);
-      border-radius: 10px;
+    .hdr-ico {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--bl), var(--pu));
+      border-radius: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 17px;
       flex-shrink: 0
     }
 
-    .hdr-info {
-      flex: 1;
-      min-width: 0
-    }
-
-    .hdr-name {
+    .hdr-nm {
       font-size: 15px;
-      font-weight: 700;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap
+      font-weight: 700
     }
 
-    .hdr-sub {
+    .hdr-sb {
       font-size: 11px;
-      color: var(--text2)
+      color: var(--tx2)
     }
 
-    .hdr-pill {
+    .hdr-bdg {
+      margin-left: auto;
       background: #FEE2E2;
-      color: var(--red);
+      color: var(--rd);
       font-size: 11px;
       font-weight: 700;
-      padding: 4px 10px;
+      padding: 3px 9px;
       border-radius: 20px;
       flex-shrink: 0
     }
 
-    /* ── TABS ── */
+    /* TABS */
     .tab {
       display: none;
       flex-direction: column;
-      height: calc(100vh - var(--hdr-h) - var(--nav-h));
+      height: calc(100vh - var(--hh) - var(--nh));
       overflow: hidden
     }
 
@@ -178,19 +98,19 @@
       display: flex
     }
 
-    /* ── BOTTOM NAV ── */
+    /* BOTTOM NAV */
     .bnav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      height: var(--nav-h);
-      background: var(--white);
-      border-top: 1px solid var(--border);
+      height: var(--nh);
+      background: var(--wh);
+      border-top: 1px solid var(--bdr);
       display: flex;
       align-items: center;
       z-index: 100;
-      padding: 0 8px;
+      padding: 0 4px;
       padding-bottom: env(safe-area-inset-bottom)
     }
 
@@ -200,20 +120,17 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 3px;
       background: none;
       border: none;
       cursor: pointer;
-      color: var(--gray);
-      padding: 8px 4px;
-      border-radius: 12px;
-      transition: all .2s;
-      position: relative
+      color: var(--gy);
+      padding: 6px 2px;
+      border-radius: 10px
     }
 
     .nbtn .ni {
-      font-size: 22px;
-      transition: transform .2s
+      font-size: 20px
     }
 
     .nbtn .nl {
@@ -222,48 +139,46 @@
     }
 
     .nbtn.on {
-      color: var(--blue)
+      color: var(--bl)
     }
 
-    .nbtn.on .ni {
-      transform: scale(1.15)
-    }
-
-    /* Signal tugmasi alohida */
-    .nbtn.signal-center {
-      background: linear-gradient(135deg, #4F6EF7, #8B5CF6);
+    .nbtn.sig-btn {
+      background: linear-gradient(135deg, var(--bl), var(--pu));
       color: #fff;
-      border-radius: 20px;
-      padding: 10px 20px;
-      margin: 0 4px;
-      box-shadow: 0 4px 14px rgba(79, 110, 247, .45)
+      border-radius: 16px;
+      padding: 8px 16px;
+      margin: 0 3px
     }
 
-    .nbtn.signal-center.on {
+    .nbtn.sig-btn.on {
       color: #fff
     }
 
-    .nbtn.signal-center .ni {
-      font-size: 24px
+    /* TOAST */
+    .toast {
+      position: fixed;
+      top: 64px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      background: #1E293B;
+      color: #fff;
+      padding: 9px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .25s;
+      z-index: 9999;
+      white-space: nowrap
     }
 
-    @keyframes pulse {
-
-      0%,
-      100% {
-        box-shadow: 0 4px 14px rgba(79, 110, 247, .45)
-      }
-
-      50% {
-        box-shadow: 0 4px 22px rgba(79, 110, 247, .75)
-      }
+    .toast.on {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
     }
 
-    .nbtn.signal-center {
-      animation: pulse 2s ease-in-out infinite
-    }
-
-    /* ══════════ MAP TAB ══════════ */
+    /* MAP TAB */
     #tab-map {
       position: relative
     }
@@ -273,16 +188,26 @@
       width: 100%
     }
 
+    .map-no {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--tx2);
+      gap: 8px
+    }
+
     .map-fab {
       position: absolute;
-      right: 14px;
-      bottom: 14px;
-      background: var(--white);
+      right: 12px;
+      bottom: 12px;
+      width: 42px;
+      height: 42px;
+      background: var(--wh);
       border: none;
       border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      font-size: 20px;
+      font-size: 19px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
       cursor: pointer;
       display: flex;
@@ -290,452 +215,159 @@
       justify-content: center
     }
 
-    /* ══════════ SIGNAL TAB ══════════ */
-    #tab-signal {
-      overflow-y: auto;
-      background: var(--bg)
-    }
-
-    /* Signal form card */
-    .signal-hero {
-      background: linear-gradient(135deg, #4F6EF7 0%, #8B5CF6 100%);
-      margin: 12px;
-      border-radius: 18px;
-      padding: 16px;
-      color: #fff;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px
-    }
-
-    .signal-hero-icon {
-      width: 44px;
-      height: 44px;
-      background: rgba(255, 255, 255, .2);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0
-    }
-
-    .signal-hero-title {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 4px
-    }
-
-    .signal-hero-sub {
-      font-size: 12px;
-      opacity: .85;
-      line-height: 1.5
-    }
-
-    .sig-section {
-      margin: 0 12px 10px;
-      background: var(--white);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .05)
-    }
-
-    .sig-section-hdr {
-      padding: 12px 14px 4px;
-      display: flex;
-      align-items: center;
-      gap: 8px
-    }
-
-    .sig-section-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      flex-shrink: 0
-    }
-
-    .si-green {
-      background: #D1FAE5
-    }
-
-    .si-blue {
-      background: #DBEAFE
-    }
-
-    .si-purple {
-      background: #EDE9FE
-    }
-
-    .sig-section-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text)
-    }
-
-    .sig-section-sub {
-      font-size: 11px;
-      color: var(--text2);
-      margin-left: auto
-    }
-
-    /* GPS row */
-    .gps-row {
-      margin: 4px 14px 12px;
-      background: var(--bg);
-      border-radius: 12px;
-      padding: 11px 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer
-    }
-
-    .gps-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0
-    }
-
-    .gps-dot.wait {
-      background: #FCD34D
-    }
-
-    .gps-dot.ok {
-      background: var(--green);
-      box-shadow: 0 0 0 3px rgba(34, 197, 94, .2)
-    }
-
-    .gps-dot.err {
-      background: var(--red)
-    }
-
-    .gps-txt {
-      font-size: 13px;
-      font-weight: 500;
-      flex: 1
-    }
-
-    .gps-sub {
-      font-size: 11px;
-      color: var(--text2)
-    }
-
-    /* Rasm tugmalari */
-    .photo-btns {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      padding: 4px 14px 12px
-    }
-
-    .photo-btn {
-      border: 1.5px dashed var(--border);
-      background: var(--bg);
-      border-radius: 12px;
-      padding: 16px 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      font-size: 12px;
-      color: var(--text2);
-      font-weight: 500
-    }
-
-    .photo-btn:active {
-      background: var(--border)
-    }
-
-    .photo-btn .pb-icon {
-      font-size: 28px
-    }
-
-    .preview-img-wrap {
-      margin: 4px 14px 12px;
-      border-radius: 12px;
-      overflow: hidden;
-      position: relative
-    }
-
-    .preview-img-wrap img {
-      width: 100%;
-      max-height: 180px;
-      object-fit: cover;
-      display: block
-    }
-
-    .rm-photo {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(0, 0, 0, .6);
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center
-    }
-
-    /* Textarea */
-    .sig-textarea {
-      width: 100%;
-      border: none;
-      outline: none;
-      font-family: inherit;
-      font-size: 14px;
-      color: var(--text);
-      background: transparent;
-      padding: 4px 14px 14px;
-      resize: none;
-      line-height: 1.6
-    }
-
-    .sig-textarea::placeholder {
-      color: var(--gray)
-    }
-
-    /* Kategoriyalar */
-    .cats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 8px 14px 14px
-    }
-
-    .cat-btn {
-      border: 1.5px solid var(--border);
-      background: var(--white);
-      border-radius: 24px;
-      padding: 7px 14px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      color: var(--text2);
-      transition: all .15s;
-      display: flex;
-      align-items: center;
-      gap: 5px
-    }
-
-    .cat-btn.sel {
-      background: var(--blue);
-      border-color: var(--blue);
-      color: #fff
-    }
-
-    .cat-btn .cb-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%
-    }
-
-    /* Ta'sir ko'rsatgich */
-    .impact-row {
-      margin: 0 12px 10px;
-      background: var(--white);
-      border-radius: 16px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between
-    }
-
-    .impact-label {
-      font-size: 12px;
-      color: var(--text2)
-    }
-
-    .impact-val {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--orange)
-    }
-
-    .impact-hint {
-      font-size: 11px;
-      color: var(--text2)
-    }
-
-    /* Submit tugma */
-    .submit-wrap {
-      padding: 4px 12px 12px
-    }
-
-    .btn-submit {
-      width: 100%;
-      background: linear-gradient(90deg, #4F6EF7, #8B5CF6);
-      color: #fff;
-      border: none;
-      border-radius: 16px;
-      padding: 16px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      letter-spacing: .3px
-    }
-
-    .btn-submit:disabled {
-      opacity: .5;
-      cursor: not-allowed
-    }
-
-    /* ══════════ LENTA TAB ══════════ */
+    /* LENTA TAB */
     #tab-lenta {
-      overflow-y: auto;
-      background: var(--bg)
+      overflow-y: auto
     }
 
-    .lenta-hdr {
-      padding: 14px 14px 8px;
+    .lhdr {
+      padding: 12px 14px 8px;
       display: flex;
       align-items: center;
-      justify-content: space-between
+      justify-content: space-between;
+      background: var(--wh);
+      border-bottom: 1px solid var(--bdr);
+      flex-shrink: 0
     }
 
-    .lenta-title {
-      font-size: 17px;
+    .ltitle {
+      font-size: 16px;
       font-weight: 800
     }
 
-    .filter-row {
+    .frow {
       display: flex;
       gap: 6px;
-      padding: 0 12px 10px;
-      overflow-x: auto
+      padding: 8px 12px;
+      overflow-x: auto;
+      flex-shrink: 0;
+      background: var(--wh);
+      border-bottom: 1px solid var(--bdr)
     }
 
-    .filter-row::-webkit-scrollbar {
+    .frow::-webkit-scrollbar {
       display: none
     }
 
-    .f-btn {
-      border: 1.5px solid var(--border);
-      background: var(--white);
+    .fbtn {
+      border: 1.5px solid var(--bdr);
+      background: var(--wh);
       border-radius: 20px;
-      padding: 6px 14px;
+      padding: 5px 12px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      color: var(--text2);
+      color: var(--tx2);
       white-space: nowrap;
       flex-shrink: 0
     }
 
-    .f-btn.on {
-      background: var(--blue);
-      border-color: var(--blue);
+    .fbtn.on {
+      background: var(--bl);
+      border-color: var(--bl);
       color: #fff
     }
 
-    .post-card {
-      background: var(--white);
-      margin: 0 12px 10px;
-      border-radius: 16px;
+    .feed {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 0 8px
+    }
+
+    .pcard {
+      background: var(--wh);
+      margin: 0 10px 8px;
+      border-radius: 14px;
       overflow: hidden;
       box-shadow: 0 1px 4px rgba(0, 0, 0, .06)
     }
 
-    .post-cat-bar {
+    .pbar {
       height: 4px
     }
 
-    .post-body {
-      padding: 12px 14px 8px
+    .pbody {
+      padding: 10px 13px 8px
     }
 
-    .post-badge {
+    .pbadge {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       font-size: 11px;
       font-weight: 700;
-      padding: 4px 10px;
+      padding: 3px 9px;
       border-radius: 20px;
-      margin-bottom: 8px
+      margin-bottom: 6px
     }
 
-    .badge-muammo {
+    .b-muammo {
       background: #FEE2E2;
       color: #DC2626
     }
 
-    .badge-narkotik {
+    .b-narkotik {
       background: #F3F4F6;
-      color: #374151
+      color: #1F2937
     }
 
-    .badge-jinoyat {
-      background: #FEF3C7;
-      color: #92400E
-    }
-
-    .badge-axlat {
-      background: #D1FAE5;
-      color: #065F46
-    }
-
-    .badge-kasal {
+    .b-kasal {
       background: #DBEAFE;
       color: #1D4ED8
     }
 
-    .badge-boshqa {
+    .b-axlat {
+      background: #D1FAE5;
+      color: #065F46
+    }
+
+    .b-jinoyat {
+      background: #FEF3C7;
+      color: #92400E
+    }
+
+    .b-boshqa {
       background: #EDE9FE;
       color: #5B21B6
     }
 
-    .post-desc {
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.6;
-      margin-bottom: 8px
+    .pdesc {
+      font-size: 13px;
+      color: var(--tx);
+      line-height: 1.55;
+      margin-bottom: 6px
     }
 
-    .post-img-thumb {
+    .pimg {
       width: 100%;
-      max-height: 200px;
+      max-height: 180px;
       object-fit: cover;
       display: block;
-      border-radius: 10px;
-      margin-bottom: 8px
+      border-radius: 8px;
+      margin-bottom: 6px
     }
 
-    .post-footer {
+    .pfoot {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding-top: 8px;
-      border-top: 1px solid var(--border)
+      gap: 7px;
+      padding-top: 6px;
+      border-top: 1px solid var(--bdr)
     }
 
-    .post-author {
+    .pauth {
       font-size: 12px;
-      color: var(--text2);
+      color: var(--tx2);
       flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap
     }
 
-    .post-role {
+    .prole {
       font-size: 10px;
       font-weight: 700;
-      padding: 2px 8px;
+      padding: 2px 7px;
       border-radius: 20px;
       flex-shrink: 0
     }
@@ -752,274 +384,518 @@
 
     .pr-aholi {
       background: #F1F5F9;
-      color: #64748B
+      color: #475569
     }
 
-    .btn-like {
+    .btnlike {
       background: none;
       border: none;
       cursor: pointer;
       font-size: 12px;
-      color: var(--text2);
+      color: var(--tx2);
       display: flex;
       align-items: center;
-      gap: 4px;
-      padding: 4px 8px;
-      border-radius: 8px
+      gap: 3px;
+      padding: 3px 7px;
+      border-radius: 7px
     }
 
-    .btn-like.liked {
-      color: var(--red)
+    .btnlike.on {
+      color: var(--rd)
     }
 
-    .btn-hal {
+    .btnhal {
       background: #D1FAE5;
       color: #065F46;
       border: none;
-      border-radius: 8px;
-      padding: 4px 10px;
+      border-radius: 7px;
+      padding: 3px 9px;
       font-size: 11px;
       font-weight: 700;
-      cursor: pointer;
-      flex-shrink: 0
+      cursor: pointer
     }
 
-    .resolved-badge {
+    .res-tag {
       font-size: 11px;
-      color: var(--green);
+      color: var(--gr);
       font-weight: 700
     }
 
     .empty {
       text-align: center;
-      padding: 60px 20px;
-      color: var(--text2)
+      padding: 50px 20px;
+      color: var(--tx2)
     }
 
-    .empty-icon {
-      font-size: 42px;
-      margin-bottom: 10px
+    .empty .ei {
+      font-size: 36px;
+      margin-bottom: 8px
     }
 
-    /* ══════════ CHAT TAB ══════════ */
+    /* SIGNAL TAB */
+    #tab-signal {
+      overflow-y: auto
+    }
+
+    .shero {
+      background: linear-gradient(135deg, var(--bl), var(--pu));
+      margin: 10px;
+      border-radius: 16px;
+      padding: 14px;
+      color: #fff;
+      display: flex;
+      align-items: flex-start;
+      gap: 11px
+    }
+
+    .shero-ico {
+      width: 42px;
+      height: 42px;
+      background: rgba(255, 255, 255, .2);
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 21px;
+      flex-shrink: 0
+    }
+
+    .shero-t {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3px
+    }
+
+    .shero-s {
+      font-size: 12px;
+      opacity: .85;
+      line-height: 1.5
+    }
+
+    .scard {
+      margin: 0 10px 8px;
+      background: var(--wh);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .05)
+    }
+
+    .scardh {
+      padding: 10px 13px 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .scardico {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px
+    }
+
+    .sci-g {
+      background: #D1FAE5
+    }
+
+    .sci-b {
+      background: #DBEAFE
+    }
+
+    .sci-p {
+      background: #EDE9FE
+    }
+
+    .scardhttl {
+      font-size: 13px;
+      font-weight: 700
+    }
+
+    .gps-row {
+      margin: 3px 13px 10px;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 10px 13px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer
+    }
+
+    .gps-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .gps-dot.w {
+      background: #FCD34D
+    }
+
+    .gps-dot.ok {
+      background: var(--gr);
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, .2)
+    }
+
+    .gps-dot.er {
+      background: var(--rd)
+    }
+
+    .gps-txt {
+      font-size: 13px;
+      font-weight: 500
+    }
+
+    .gps-sub {
+      font-size: 11px;
+      color: var(--tx2);
+      margin-top: 1px
+    }
+
+    .photo-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      padding: 3px 13px 10px
+    }
+
+    .pbtn {
+      border: 1.5px dashed var(--bdr);
+      background: var(--bg);
+      border-radius: 11px;
+      padding: 14px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--tx2);
+      font-weight: 500
+    }
+
+    .pbtn .pbi {
+      font-size: 26px
+    }
+
+    .prev-wrap {
+      margin: 3px 13px 10px;
+      border-radius: 11px;
+      overflow: hidden;
+      position: relative
+    }
+
+    .prev-wrap img {
+      width: 100%;
+      max-height: 160px;
+      object-fit: cover;
+      display: block
+    }
+
+    .rm-img {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      background: rgba(0, 0, 0, .6);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .stxt {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--tx);
+      background: transparent;
+      padding: 3px 13px 12px;
+      resize: none;
+      line-height: 1.6
+    }
+
+    .stxt::placeholder {
+      color: var(--gy)
+    }
+
+    .cats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      padding: 6px 13px 12px
+    }
+
+    .catbtn {
+      border: 1.5px solid var(--bdr);
+      background: var(--wh);
+      border-radius: 22px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--tx2);
+      display: flex;
+      align-items: center;
+      gap: 4px
+    }
+
+    .catbtn .cd {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%
+    }
+
+    .catbtn.on {
+      background: var(--bl);
+      border-color: var(--bl);
+      color: #fff
+    }
+
+    .sbtn {
+      width: calc(100% - 20px);
+      margin: 3px 10px 12px;
+      background: linear-gradient(90deg, var(--bl), var(--pu));
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px
+    }
+
+    .sbtn:disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+
+    /* CHAT TAB */
     #tab-chat {
       overflow: hidden
     }
 
-    .chat-views {
+    .clist-wrap {
       display: flex;
       flex-direction: column;
       height: 100%
     }
 
-    .chat-list-wrap {
-      display: flex;
-      flex-direction: column;
-      height: 100%
-    }
-
-    .chat-list-wrap.hide {
+    .clist-wrap.hide {
       display: none
     }
 
-    .chat-list-hdr {
-      padding: 14px 14px 10px;
-      font-size: 17px;
+    .clhdr {
+      padding: 12px 14px 10px;
+      font-size: 16px;
       font-weight: 800;
-      background: var(--white);
-      border-bottom: 1px solid var(--border)
+      background: var(--wh);
+      border-bottom: 1px solid var(--bdr);
+      flex-shrink: 0
     }
 
-    .chat-list-body {
+    .clist {
       overflow-y: auto;
       flex: 1
     }
 
-    .chat-item {
+    .citem {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
+      gap: 11px;
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--bdr);
       cursor: pointer;
-      background: var(--white);
-      transition: background .1s
+      background: var(--wh)
     }
 
-    .chat-item:active {
+    .citem:active {
       background: var(--bg)
     }
 
-    .chat-av {
-      width: 46px;
-      height: 46px;
+    .cav {
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
       flex-shrink: 0
     }
 
-    .ca-group {
+    .cav-g {
       background: linear-gradient(135deg, #DBEAFE, #EDE9FE);
-      color: var(--blue)
+      color: var(--bl)
     }
 
-    .ca-user {
+    .cav-u {
       background: #D1FAE5;
-      color: var(--teal)
+      color: var(--te)
     }
 
-    .chat-meta {
+    .cmeta {
       flex: 1;
       min-width: 0
     }
 
-    .chat-name2 {
+    .cname {
       font-size: 14px;
       font-weight: 700;
       margin-bottom: 2px
     }
 
-    .chat-last2 {
+    .clast {
       font-size: 12px;
-      color: var(--text2);
+      color: var(--tx2);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap
     }
 
-    .chat-time2 {
+    .ctime {
       font-size: 11px;
-      color: var(--text2);
+      color: var(--tx2);
       flex-shrink: 0
     }
 
-    /* Chat room */
-    .chat-room-wrap {
+    .croom-wrap {
       display: none;
       flex-direction: column;
       height: 100%
     }
 
-    .chat-room-wrap.on {
+    .croom-wrap.on {
       display: flex
     }
 
-    .chat-room-hdr {
-      padding: 10px 14px;
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
+    .crhdr {
+      padding: 9px 13px;
+      background: var(--wh);
+      border-bottom: 1px solid var(--bdr);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
       flex-shrink: 0
     }
 
-    .back-btn {
+    .backbtn {
       background: none;
       border: none;
-      font-size: 22px;
+      font-size: 21px;
       cursor: pointer;
-      color: var(--text);
-      padding: 0 6px 0 0
+      color: var(--tx)
     }
 
-    .room-name {
-      font-size: 15px;
+    .crname {
+      font-size: 14px;
       font-weight: 700;
       flex: 1
     }
 
-    .room-sub {
+    .crsub {
       font-size: 11px;
-      color: var(--text2)
+      color: var(--tx2)
     }
 
-    .msgs-wrap {
+    .msgs {
       flex: 1;
       overflow-y: auto;
-      padding: 12px 12px 6px;
+      padding: 10px 10px 6px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
       background: var(--bg)
     }
 
-    .msg-b {
+    .mb {
       max-width: 80%;
-      padding: 9px 13px;
-      border-radius: 16px;
+      padding: 8px 12px;
+      border-radius: 14px;
       font-size: 13px;
       line-height: 1.5;
       word-break: break-word
     }
 
-    .msg-out {
+    .mb-out {
       align-self: flex-end;
-      background: linear-gradient(135deg, #4F6EF7, #8B5CF6);
+      background: linear-gradient(135deg, var(--bl), var(--pu));
       color: #fff;
       border-bottom-right-radius: 4px
     }
 
-    .msg-in {
+    .mb-in {
       align-self: flex-start;
-      background: var(--white);
-      color: var(--text);
+      background: var(--wh);
+      color: var(--tx);
       border-bottom-left-radius: 4px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, .07)
     }
 
-    .msg-sndr {
+    .msndr {
       font-size: 10px;
       font-weight: 700;
       margin-bottom: 3px;
       opacity: .7
     }
 
-    .msg-t {
+    .mt {
       font-size: 10px;
       margin-top: 3px;
       opacity: .6;
       text-align: right
     }
 
-    .msg-input-bar {
-      padding: 8px 12px;
-      background: var(--white);
-      border-top: 1px solid var(--border);
+    .minput-bar {
+      padding: 7px 10px;
+      background: var(--wh);
+      border-top: 1px solid var(--bdr);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       flex-shrink: 0
     }
 
-    .msg-input {
+    .minput {
       flex: 1;
-      border: 1.5px solid var(--border);
-      border-radius: 24px;
-      padding: 10px 16px;
+      border: 1.5px solid var(--bdr);
+      border-radius: 22px;
+      padding: 9px 14px;
       font-size: 14px;
       font-family: inherit;
       outline: none;
       background: var(--bg)
     }
 
-    .msg-input:focus {
-      border-color: var(--blue);
-      background: var(--white)
+    .minput:focus {
+      border-color: var(--bl);
+      background: var(--wh)
     }
 
-    .send-btn {
-      width: 40px;
-      height: 40px;
+    .sendbtn {
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #4F6EF7, #8B5CF6);
+      background: linear-gradient(135deg, var(--bl), var(--pu));
       border: none;
       color: #fff;
-      font-size: 18px;
+      font-size: 17px;
       cursor: pointer;
       flex-shrink: 0;
       display: flex;
@@ -1027,24 +903,18 @@
       justify-content: center
     }
 
-    /* ══════════ TAHLIL TAB ══════════ */
+    /* TAHLIL TAB */
     #tab-tahlil {
       overflow-y: auto;
-      padding: 12px;
-      gap: 10px;
-      display: none;
-      flex-direction: column;
+      padding: 10px;
+      gap: 8px;
       background: var(--bg)
     }
 
-    #tab-tahlil.on {
-      display: flex
-    }
-
-    .tahlil-score {
-      background: linear-gradient(135deg, #4F6EF7, #8B5CF6);
-      border-radius: 18px;
-      padding: 20px;
+    .tscore {
+      background: linear-gradient(135deg, var(--bl2), var(--bl));
+      border-radius: 16px;
+      padding: 18px;
       color: #fff;
       display: flex;
       align-items: center;
@@ -1052,965 +922,824 @@
       margin-bottom: 2px
     }
 
-    .ts-left .ts-lbl {
+    .tsl .tslbl {
       font-size: 12px;
       opacity: .8;
-      margin-bottom: 4px
+      margin-bottom: 3px
     }
 
-    .ts-left .ts-num {
-      font-size: 42px;
+    .tsl .tsnum {
+      font-size: 40px;
       font-weight: 900;
       line-height: 1
     }
 
-    .ts-left .ts-rank {
+    .tsl .tsrank {
       font-size: 12px;
       opacity: .75;
-      margin-top: 6px
+      margin-top: 5px
     }
 
-    .ts-icon {
-      font-size: 52px;
+    .tsico {
+      font-size: 48px;
       opacity: .2
     }
 
-    .stats-grid {
+    .sgrid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px
+      gap: 7px
     }
 
-    .stat-c {
-      background: var(--white);
-      border-radius: 14px;
-      padding: 14px;
+    .sgrid.t3 {
+      grid-template-columns: 1fr 1fr 1fr
+    }
+
+    .sc {
+      background: var(--wh);
+      border-radius: 12px;
+      padding: 13px 9px;
       text-align: center;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .05)
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .05)
     }
 
-    .stat-n {
-      font-size: 26px;
+    .sn {
+      font-size: 22px;
       font-weight: 900
     }
 
-    .stat-l {
+    .sl {
       font-size: 11px;
-      color: var(--text2);
+      color: var(--tx2);
       margin-top: 2px
     }
 
-    .section-h {
-      font-size: 15px;
+    .secth {
+      font-size: 14px;
       font-weight: 800;
-      margin-bottom: 8px;
-      color: var(--text)
+      margin-bottom: 7px
     }
 
     .lb-wrap {
-      background: var(--white);
-      border-radius: 14px;
+      background: var(--wh);
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .05)
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .05)
     }
 
     .lb-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 11px 14px;
-      border-bottom: 1px solid var(--border)
+      gap: 10px;
+      padding: 10px 13px;
+      border-bottom: 1px solid var(--bdr)
     }
 
     .lb-item:last-child {
       border-bottom: none
     }
 
-    .lb-badge {
-      width: 28px;
-      height: 28px;
+    .lbn {
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
-      flex-shrink: 0
+      flex-shrink: 0;
+      background: var(--bg);
+      color: var(--tx2)
     }
 
-    .lb-1 {
+    .lb1 {
       background: #FEF3C7;
       color: #D97706
     }
 
-    .lb-2 {
+    .lb2 {
       background: #F1F5F9;
       color: #475569
     }
 
-    .lb-3 {
+    .lb3 {
       background: #FEF0E7;
       color: #C2580A
     }
 
-    .lb-n {
-      background: var(--bg);
-      color: var(--text2)
-    }
-
-    .lb-name2 {
+    .lbname {
       flex: 1;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600
     }
 
-    .lb-score2 {
-      font-size: 14px;
+    .lbsc {
+      font-size: 13px;
       font-weight: 800;
-      color: var(--blue)
+      color: var(--bl)
     }
 
-    /* Kategoriya statistika */
-    .cat-stats {
-      background: var(--white);
-      border-radius: 14px;
-      padding: 14px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .05)
+    .catstats {
+      background: var(--wh);
+      border-radius: 12px;
+      padding: 12px 13px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .05)
     }
 
-    .cs-row {
+    .csr {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 10px
+      gap: 9px;
+      margin-bottom: 8px
     }
 
-    .cs-row:last-child {
+    .csr:last-child {
       margin-bottom: 0
     }
 
-    .cs-icon {
-      font-size: 16px;
-      width: 24px;
+    .csico {
+      font-size: 15px;
+      width: 22px;
       text-align: center
     }
 
-    .cs-label {
+    .cslbl {
       font-size: 13px;
-      color: var(--text2);
+      color: var(--tx2);
       flex: 1
     }
 
-    .cs-bar-wrap {
-      width: 100px;
+    .csbw {
+      width: 90px;
       height: 6px;
       background: var(--bg);
       border-radius: 3px;
       overflow: hidden
     }
 
-    .cs-bar {
+    .csb {
       height: 100%;
-      border-radius: 3px;
-      background: var(--blue)
+      border-radius: 3px
     }
 
-    .cs-count {
-      font-size: 13px;
+    .cscnt {
+      font-size: 12px;
       font-weight: 700;
-      min-width: 24px;
+      min-width: 22px;
       text-align: right
     }
 
-    .rules-c {
-      background: var(--white);
-      border-radius: 14px;
-      padding: 14px;
+    .rules {
+      background: var(--wh);
+      border-radius: 12px;
+      padding: 12px 13px;
       font-size: 13px;
       line-height: 1.9;
-      color: var(--text2);
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .05)
+      color: var(--tx2);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .05)
     }
   </style>
 </head>
 
 <body>
 
-  <div id="loading">
-    <div style="font-size:48px">🏘️</div>
-    <div class="spin"></div>
-    <p>Mahalla Bot yuklanmoqda...</p>
-  </div>
-  <div class="toast" id="toast"></div>
-
-  <!-- HEADER -->
   <div class="hdr">
-    <div class="hdr-logo">🏘️</div>
-    <div class="hdr-info">
-      <div class="hdr-name" id="hdr-name">Mahalla Bot</div>
-      <div class="hdr-sub" id="hdr-sub">Yuklanmoqda...</div>
+    <div class="hdr-ico">🏘️</div>
+    <div>
+      <div class="hdr-nm" id="hdr-nm">Mahalla Bot</div>
+      <div class="hdr-sb" id="hdr-sb">Yuklanmoqda...</div>
     </div>
-    <div class="hdr-pill" id="hdr-pill">—</div>
+    <div class="hdr-bdg" id="hdr-bdg">—</div>
   </div>
 
-  <!-- ═══ TAB: XARITA ═══ -->
+  <!-- XARITA -->
   <div class="tab on" id="tab-map">
     <div id="ymap" style="flex:1;width:100%"></div>
-    <button class="map-fab" onclick="centerMap()" title="Mening joylashuvim">📍</button>
+    <button class="map-fab" onclick="centerMap()">📍</button>
   </div>
 
-  <!-- ═══ TAB: LENTA ═══ -->
+  <!-- LENTA -->
   <div class="tab" id="tab-lenta">
-    <div class="lenta-hdr">
-      <div class="lenta-title">📋 Mahalla lentasi</div>
+    <div class="lhdr">
+      <div class="ltitle">📋 Mahalla lentasi</div>
     </div>
-    <div class="filter-row" id="filter-row">
-      <button class="f-btn on" data-f="all" onclick="setFilter(this)">Hammasi</button>
-      <button class="f-btn" data-f="muammo" onclick="setFilter(this)">🔴 Muammo</button>
-      <button class="f-btn" data-f="narkotik" onclick="setFilter(this)">🚨 Narkotik</button>
-      <button class="f-btn" data-f="kasal" onclick="setFilter(this)">🏥 Kasal</button>
-      <button class="f-btn" data-f="axlat" onclick="setFilter(this)">🗑️ Axlat</button>
-      <button class="f-btn" data-f="jinoyat" onclick="setFilter(this)">⚠️ Jinoyat</button>
-      <button class="f-btn" data-f="boshqa" onclick="setFilter(this)">💬 Boshqa</button>
+    <div class="frow" id="frow">
+      <button class="fbtn on" data-f="all" onclick="setFilter(this)">Hammasi</button>
+      <button class="fbtn" data-f="muammo" onclick="setFilter(this)">🔴 Muammo</button>
+      <button class="fbtn" data-f="narkotik" onclick="setFilter(this)">🚨 Narkotik</button>
+      <button class="fbtn" data-f="kasal" onclick="setFilter(this)">🏥 Kasal</button>
+      <button class="fbtn" data-f="axlat" onclick="setFilter(this)">🗑️ Axlat</button>
+      <button class="fbtn" data-f="jinoyat" onclick="setFilter(this)">⚠️ Jinoyat</button>
+      <button class="fbtn" data-f="boshqa" onclick="setFilter(this)">💬 Boshqa</button>
     </div>
-    <div id="feed-list" style="flex:1;overflow-y:auto;padding-bottom:8px">
+    <div class="feed" id="feed-list">
       <div class="empty">
-        <div class="empty-icon">📭</div>
+        <div class="ei">📭</div>
         <div>Hozircha yangilik yo'q</div>
       </div>
     </div>
   </div>
 
-  <!-- ═══ TAB: SIGNAL ═══ -->
+  <!-- SIGNAL -->
   <div class="tab" id="tab-signal">
     <div style="flex:1;overflow-y:auto;padding-bottom:8px">
-
-      <div class="signal-hero">
-        <div class="signal-hero-icon">📢</div>
+      <div class="shero">
+        <div class="shero-ico">📢</div>
         <div>
-          <div class="signal-hero-title">Muammoni xabar bering!</div>
-          <div class="signal-hero-sub">Rasm va batafsil izoh qo'shsangiz, tegishli tashkilot <b>tekshiruvda birinchi</b>
-            ko'rib chiqadi</div>
+          <div class="shero-t">Muammoni xabar bering!</div>
+          <div class="shero-s">Rasm va izoh qo'shsangiz tezroq ko'rib chiqiladi</div>
         </div>
       </div>
 
-      <!-- Ta'sir -->
-      <div class="impact-row">
-        <div>
-          <div class="impact-label">📈 Ta'sir</div>
-          <div class="impact-val" id="impact-val">0%</div>
-        </div>
-        <div class="impact-hint">Rasm qo'shsangiz ko'proq tarqaladi</div>
-      </div>
-
-      <!-- Joylashuv -->
-      <div class="sig-section">
-        <div class="sig-section-hdr">
-          <div class="sig-section-icon si-green">📍</div>
-          <div class="sig-section-title">Joylashuvni aniqlash</div>
-          <div class="sig-section-sub" id="gps-sub">Bosing — GPS avtomatik</div>
+      <div class="scard">
+        <div class="scardh">
+          <div class="scardico sci-g">📍</div>
+          <div class="scardhttl">Joylashuv</div>
         </div>
         <div class="gps-row" id="gps-row" onclick="retryGPS()">
-          <div class="gps-dot wait" id="gps-dot"></div>
+          <div class="gps-dot w" id="gps-dot"></div>
           <div>
             <div class="gps-txt" id="gps-txt">GPS aniqlanmoqda...</div>
+            <div class="gps-sub" id="gps-sub">Bosib qayta urining</div>
           </div>
         </div>
       </div>
 
-      <!-- Rasm -->
-      <div class="sig-section">
-        <div class="sig-section-hdr">
-          <div class="sig-section-icon si-blue">📷</div>
-          <div class="sig-section-title">Rasm yuklash</div>
+      <div class="scard">
+        <div class="scardh">
+          <div class="scardico sci-b">📷</div>
+          <div class="scardhttl">Rasm yuklash</div>
         </div>
         <div class="photo-btns" id="photo-btns">
-          <button class="photo-btn" onclick="openCam()">
-            <div class="pb-icon">📸</div>
-            <div>Kamera</div>
+          <button class="pbtn" onclick="document.getElementById('pic-cam').click()">
+            <div class="pbi">📸</div>Kamera
           </button>
-          <button class="photo-btn" onclick="openGallery()">
-            <div class="pb-icon">🖼️</div>
-            <div>Galereya</div>
+          <button class="pbtn" onclick="document.getElementById('pic-gal').click()">
+            <div class="pbi">🖼️</div>Galereya
           </button>
         </div>
-        <div id="preview-wrap" style="display:none">
-          <div class="preview-img-wrap">
-            <img id="preview-img" src="" alt="">
-            <button class="rm-photo" onclick="rmPhoto()">✕</button>
-          </div>
+        <div class="prev-wrap" id="prev-wrap" style="display:none">
+          <img id="prev-img" src="" alt="">
+          <button class="rm-img" onclick="rmPhoto()">✕</button>
         </div>
-        <input type="file" id="photo-cam" accept="image/*" capture="environment" style="display:none"
+        <input type="file" id="pic-cam" accept="image/*" capture="environment" style="display:none"
           onchange="onPhoto(this)">
-        <input type="file" id="photo-gal" accept="image/*" style="display:none" onchange="onPhoto(this)">
+        <input type="file" id="pic-gal" accept="image/*" style="display:none" onchange="onPhoto(this)">
       </div>
 
-      <!-- Izoh -->
-      <div class="sig-section">
-        <div class="sig-section-hdr">
-          <div class="sig-section-icon si-purple">✏️</div>
-          <div class="sig-section-title">Izoh</div>
+      <div class="scard">
+        <div class="scardh">
+          <div class="scardico sci-p">✏️</div>
+          <div class="scardhttl">Izoh</div>
         </div>
-        <textarea class="sig-textarea" id="post-desc" rows="4" placeholder="Muammoni tasvirlab bering..."
-          oninput="updateImpact()"></textarea>
+        <textarea class="stxt" id="sdesc" rows="4" placeholder="Muammoni qisqacha tasvirlab bering..."></textarea>
       </div>
 
-      <!-- Kategoriyalar -->
-      <div class="sig-section">
-        <div class="sig-section-hdr">
-          <div class="sig-section-icon si-green">🏷️</div>
-          <div class="sig-section-title">Kategoriya</div>
+      <div class="scard">
+        <div class="scardh">
+          <div class="scardico sci-g">🏷️</div>
+          <div class="scardhttl">Kategoriya</div>
         </div>
         <div class="cats">
-          <button class="cat-btn sel" data-t="muammo" onclick="selCat(this)">
-            <div class="cb-dot" style="background:#EF4444"></div> Muammo
+          <button class="catbtn on" data-t="muammo" onclick="selCat(this)">
+            <div class="cd" style="background:#EF4444"></div>Muammo
           </button>
-          <button class="cat-btn" data-t="narkotik" onclick="selCat(this)">
-            <div class="cb-dot" style="background:#374151"></div> Narkotik
+          <button class="catbtn" data-t="narkotik" onclick="selCat(this)">
+            <div class="cd" style="background:#374151"></div>Narkotik
           </button>
-          <button class="cat-btn" data-t="kasal" onclick="selCat(this)">
-            <div class="cb-dot" style="background:#3B82F6"></div> Kasal
+          <button class="catbtn" data-t="kasal" onclick="selCat(this)">
+            <div class="cd" style="background:#3B82F6"></div>Kasal
           </button>
-          <button class="cat-btn" data-t="axlat" onclick="selCat(this)">
-            <div class="cb-dot" style="background:#22C55E"></div> Axlat
+          <button class="catbtn" data-t="axlat" onclick="selCat(this)">
+            <div class="cd" style="background:#22C55E"></div>Axlat
           </button>
-          <button class="cat-btn" data-t="jinoyat" onclick="selCat(this)">
-            <div class="cb-dot" style="background:#F59E0B"></div> Jinoyat
+          <button class="catbtn" data-t="jinoyat" onclick="selCat(this)">
+            <div class="cd" style="background:#F59E0B"></div>Jinoyat
           </button>
-          <button class="cat-btn" data-t="boshqa" onclick="selCat(this)">
-            <div class="cb-dot" style="background:#8B5CF6"></div> Boshqa
+          <button class="catbtn" data-t="boshqa" onclick="selCat(this)">
+            <div class="cd" style="background:#8B5CF6"></div>Boshqa
           </button>
         </div>
       </div>
 
-      <div class="submit-wrap">
-        <button class="btn-submit" id="post-btn" onclick="submitPost()">
-          ➤ Signal yuborish
-        </button>
-      </div>
+      <button class="sbtn" id="sbtn" onclick="submitPost()">➤ Signal yuborish</button>
     </div>
   </div>
 
-  <!-- ═══ TAB: CHAT ═══ -->
+  <!-- CHAT -->
   <div class="tab" id="tab-chat">
-    <div class="chat-views" style="height:100%">
-      <!-- Chat ro'yxati -->
-      <div class="chat-list-wrap" id="chat-list-wrap">
-        <div class="chat-list-hdr">💬 Chatlar</div>
-        <div class="chat-list-body" id="chat-list-body"></div>
+    <div class="clist-wrap" id="clist-wrap">
+      <div class="clhdr">💬 Chatlar</div>
+      <div class="clist" id="clist"></div>
+    </div>
+    <div class="croom-wrap" id="croom-wrap">
+      <div class="crhdr">
+        <button class="backbtn" onclick="backToList()">‹</button>
+        <div>
+          <div class="crname" id="crname">Chat</div>
+          <div class="crsub" id="crsub"></div>
+        </div>
       </div>
-      <!-- Chat xona -->
-      <div class="chat-room-wrap" id="chat-room-wrap">
-        <div class="chat-room-hdr">
-          <button class="back-btn" onclick="backToList()">‹</button>
-          <div>
-            <div class="room-name" id="room-name">Chat</div>
-            <div class="room-sub" id="room-sub"></div>
-          </div>
-        </div>
-        <div class="msgs-wrap" id="msgs-wrap"></div>
-        <div class="msg-input-bar">
-          <input class="msg-input" id="msg-inp" placeholder="Xabar yozing..."
-            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
-          <button class="send-btn" onclick="sendMsg()">➤</button>
-        </div>
+      <div class="msgs" id="msgs"></div>
+      <div class="minput-bar">
+        <input class="minput" id="minput" placeholder="Xabar yozing..."
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
+        <button class="sendbtn" onclick="sendMsg()">➤</button>
       </div>
     </div>
   </div>
 
-  <!-- ═══ TAB: TAHLIL ═══ -->
+  <!-- TAHLIL -->
   <div class="tab" id="tab-tahlil">
-    <div class="tahlil-score">
-      <div class="ts-left">
-        <div class="ts-lbl">⭐ Sizning ballaringiz</div>
-        <div class="ts-num" id="my-score">—</div>
-        <div class="ts-rank" id="my-rank">Yuklanmoqda...</div>
+    <div class="tscore">
+      <div class="tsl">
+        <div class="tslbl">⭐ Sizning ballaringiz</div>
+        <div class="tsnum" id="t-score">—</div>
+        <div class="tsrank" id="t-rank">Yuklanmoqda...</div>
       </div>
-      <div class="ts-icon">🏆</div>
+      <div class="tsico">🏆</div>
     </div>
-
-    <div class="stats-grid">
-      <div class="stat-c">
-        <div class="stat-n" id="s-total" style="color:var(--blue)">—</div>
-        <div class="stat-l">Jami signal</div>
+    <div class="sgrid t3">
+      <div class="sc">
+        <div class="sn" id="t-total" style="color:var(--bl)">—</div>
+        <div class="sl">Jami</div>
       </div>
-      <div class="stat-c">
-        <div class="stat-n" id="s-pend" style="color:var(--red)">—</div>
-        <div class="stat-l">Hal etilmagan</div>
+      <div class="sc">
+        <div class="sn" id="t-pend" style="color:var(--rd)">—</div>
+        <div class="sl">Ochiq</div>
       </div>
-      <div class="stat-c">
-        <div class="stat-n" id="s-res" style="color:var(--green)">—</div>
-        <div class="stat-l">Hal qilindi</div>
-      </div>
-      <div class="stat-c">
-        <div class="stat-n" id="s-mem" style="color:var(--purple)">—</div>
-        <div class="stat-l">A'zolar</div>
+      <div class="sc">
+        <div class="sn" id="t-res" style="color:var(--gr)">—</div>
+        <div class="sl">Hal qilindi</div>
       </div>
     </div>
-
-    <div class="section-h">📊 Kategoriyalar bo'yicha</div>
-    <div class="cat-stats" id="cat-stats">
-      <div style="color:var(--text2);font-size:13px;text-align:center;padding:10px">Yuklanmoqda...</div>
-    </div>
-
-    <div class="section-h">🏆 Faollar reytingi</div>
-    <div class="lb-wrap" id="leaderboard">
-      <div class="empty">
-        <div class="empty-icon">⏳</div>
+    <div class="sgrid">
+      <div class="sc">
+        <div class="sn" id="t-toy" style="color:var(--or)">—</div>
+        <div class="sl">To'y/Tadbir</div>
+      </div>
+      <div class="sc">
+        <div class="sn" id="t-mem" style="color:var(--pu)">—</div>
+        <div class="sl">A'zolar</div>
       </div>
     </div>
-
-    <div class="rules-c">
-      📡 Signal yuborish: <b>+5 ball</b><br>
-      📷 Rasm bilan: <b>+3 bonus ball</b><br>
-      👍 Post yoqilsa: <b>+2 ball</b><br>
-      ✅ Muammo hal qilinganda: <b>+10 ball</b>
-    </div>
+    <div class="secth">📊 Kategoriyalar</div>
+    <div class="catstats" id="catstats"></div>
+    <div class="secth">🏆 Reyting</div>
+    <div class="lb-wrap" id="lb"></div>
+    <div class="rules">📡 Signal yuborish: <b>+5 ball</b><br>📷 Rasm bilan: <b>+3 bonus</b><br>👍 Post yoqilsa: <b>+2
+        ball</b><br>✅ Hal qilinganda: <b>+10 ball</b></div>
   </div>
 
-  <!-- BOTTOM NAV -->
   <nav class="bnav">
-    <button class="nbtn on" id="n-map" onclick="goTab('map')">
-      <span class="ni">🗺️</span><span class="nl">Xarita</span>
-    </button>
-    <button class="nbtn" id="n-lenta" onclick="goTab('lenta')">
-      <span class="ni">📋</span><span class="nl">Lenta</span>
-    </button>
-    <button class="nbtn signal-center on" id="n-signal" onclick="goTab('signal')">
-      <span class="ni">📡</span><span class="nl">Signal</span>
-    </button>
-    <button class="nbtn" id="n-chat" onclick="goTab('chat')">
-      <span class="ni">💬</span><span class="nl">Chat</span>
-    </button>
-    <button class="nbtn" id="n-tahlil" onclick="goTab('tahlil')">
-      <span class="ni">📊</span><span class="nl">Tahlil</span>
-    </button>
+    <button class="nbtn on" id="n-map" onclick="goTab('map')"><span class="ni">🗺️</span><span
+        class="nl">Xarita</span></button>
+    <button class="nbtn" id="n-lenta" onclick="goTab('lenta')"><span class="ni">📋</span><span
+        class="nl">Lenta</span></button>
+    <button class="nbtn sig-btn" id="n-signal" onclick="goTab('signal')"><span class="ni">📡</span><span
+        class="nl">Signal</span></button>
+    <button class="nbtn" id="n-chat" onclick="goTab('chat')"><span class="ni">💬</span><span
+        class="nl">Chat</span></button>
+    <button class="nbtn" id="n-tahlil" onclick="goTab('tahlil')"><span class="ni">📊</span><span
+        class="nl">Tahlil</span></button>
   </nav>
 
-  <script>
-    // Yandex Maps yuklanmasa ham dastur ishlaydi
-    (function () {
-      var s = document.createElement('script');
-      s.src = 'https://api-maps.yandex.ru/2.1/?lang=uz_UZ&apikey=437e6524-d574-47a4-977f-634dd5528ec7';
-      s.onerror = function () { console.warn('Yandex Maps yuklanmadi'); };
-      document.head.appendChild(s);
-    })();
-  </script>
-  <script>
-    // ══ STATE ═════════════════════════════════════════════════════
-    const tg = window.Telegram?.WebApp;
-    if (tg) { tg.expand(); tg.ready(); }
+  <div class="toast" id="toast"></div>
 
-    // CHAT_ID olish — 4 usulda
+  <script>
+    // ═══ STATE ════════════════════════════════════════════════════
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if (tg) { try { tg.expand(); tg.ready(); } catch (e) { } }
+
+    // CHAT_ID — 4 usulda olish
     let CHAT_ID = null;
-    try {
-      // 1: URL ?start= parametri (bot yuboradi)
-      const urlParams = new URLSearchParams(window.location.search);
-      const fromUrl = urlParams.get('start');
-      if (fromUrl && /^\d+$/.test(fromUrl)) {
-        CHAT_ID = fromUrl;
-        console.log('CHAT_ID URL dan:', CHAT_ID);
-      }
+    (function () {
+      try {
+        // 1. URL ?start=
+        const up = new URLSearchParams(window.location.search);
+        const us = up.get('start');
+        if (us && /^\d+$/.test(us)) { CHAT_ID = us; return; }
+        // 2. initDataUnsafe
+        const id2 = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id;
+        if (id2) { CHAT_ID = String(id2); return; }
+        // 3. initData parse
+        if (tg && tg.initData) {
+          const p = new URLSearchParams(tg.initData);
+          const u = JSON.parse(p.get('user') || '{}');
+          if (u.id) { CHAT_ID = String(u.id); return; }
+        }
+        // 4. start_param
+        const sp = tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param;
+        if (sp && /^\d+$/.test(sp)) { CHAT_ID = sp; return; }
+      } catch (e) { console.warn('CHAT_ID:', e); }
+    })();
 
-      // 2: tg.initDataUnsafe
-      if (!CHAT_ID) {
-        const uid = tg?.initDataUnsafe?.user?.id;
-        if (uid) { CHAT_ID = String(uid); console.log('CHAT_ID initDataUnsafe dan:', CHAT_ID); }
-      }
-
-      // 3: initData parse
-      if (!CHAT_ID && tg?.initData) {
-        const p = new URLSearchParams(tg.initData);
-        const u = JSON.parse(p.get('user') || '{}');
-        if (u.id) { CHAT_ID = String(u.id); console.log('CHAT_ID initData dan:', CHAT_ID); }
-      }
-
-      // 4: start_param
-      if (!CHAT_ID) {
-        const sp = tg?.initDataUnsafe?.start_param;
-        if (sp && /^\d+$/.test(sp)) { CHAT_ID = sp; console.log('CHAT_ID start_param dan:', CHAT_ID); }
-      }
-    } catch (e) { console.warn('CHAT_ID xato:', e); }
-
-    console.log('FINAL CHAT_ID:', CHAT_ID, 'URL:', window.location.href);
-    let ser = null;
+    const API = '';
+    let myLat = null, myLng = null, myUser = null;
     let myMap = null, postType = 'muammo', photoFile = null;
-    let curTab = 'map', chatMode = 'group', chatContactId = null;
-    let chatPoll = null, allPosts = [], activeFilter = 'all';
+    let curTab = 'map', chatMode = 'group', chatCid = null;
+    let chatPoll = null, allPosts = [], activeF = 'all';
 
-    // ══ INIT ══════════════════════════════════════════════════════
-    window.addEventListener('load', async () => {
-      // Loading ekranini DARHOL yashiramiz
-      const hideLoading = () => {
-        const el = document.getElementById('loading');
-        if (el) { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => { el.style.display = 'none'; }, 300); }
-      };
-
-      // 800ms dan keyin MAJBURIY yashir
-      setTimeout(hideLoading, 50);
-
-      // Parallel yuklaymiz
-      loadUser().finally(hideLoading);
+    // ═══ INIT ═════════════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', function () {
+      loadUser();
       startGPS();
       loadPosts();
-
-      // Xarita — yuklanmasa ham ishlaydi
-      if (typeof ymaps !== 'undefined') {
-        initMap();
-      } else {
-        // ymaps kelishini kutamiz (max 3 soniya)
-        let tries = 0;
-        const waitMaps = setInterval(() => {
-          tries++;
-          if (typeof ymaps !== 'undefined') {
-            clearInterval(waitMaps);
-            initMap();
-          } else if (tries > 6) {
-            clearInterval(waitMaps);
-            const yel = document.getElementById('ymap');
-            if (yel) yel.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#64748B;gap:8px"><div style="font-size:40px">🗺️</div><div style="font-size:14px;font-weight:600">Xarita kaliti kerak</div><div style="font-size:12px">developer.tech.yandex.ru</div></div>';
-          }
-        }, 500);
-      }
+      loadMap();
     });
 
-    // ══ USER ══════════════════════════════════════════════════════
+    // ═══ USER ═════════════════════════════════════════════════════
     async function loadUser() {
       if (!CHAT_ID) {
-        document.getElementById('hdr-sub').textContent = '⚠️ Telegram orqali oching';
+        document.getElementById('hdr-sb').textContent = '⚠️ Telegram orqali oching';
         return;
       }
       try {
-        const r = await fetch(`${API}/api/user/${CHAT_ID}`);
+        const r = await fetch(API + '/api/user/' + CHAT_ID);
         if (r.status === 404) {
-          document.getElementById('hdr-sub').textContent = '⚠️ Botda /start bosing';
-          showRegBanner(); return;
+          document.getElementById('hdr-sb').textContent = '⚠️ Botda /start bosing';
+          showBanner(); return;
         }
         if (r.ok) {
-          const data = await r.json();
-          if (data.error || !data.registered) {
-            document.getElementById('hdr-sub').textContent = '⚠️ Botda /start bosing';
-            showRegBanner(); return;
+          const d = await r.json();
+          if (!d || d.error || !d.registered) {
+            document.getElementById('hdr-sb').textContent = '⚠️ Botda /start bosing';
+            showBanner(); return;
           }
-          myUser = data;
-          document.getElementById('hdr-name').textContent = myUser.full_name || 'Mahalla Bot';
-          document.getElementById('hdr-sub').textContent = myUser.mahalla_id ? '\u{1F3D8}\uFE0F ' + myUser.mahalla_id : 'Mahalla Bot';
+          myUser = d;
+          document.getElementById('hdr-nm').textContent = d.full_name || 'Mahalla Bot';
+          document.getElementById('hdr-sb').textContent = d.mahalla_id ? '🏘️ ' + d.mahalla_id : 'Mahalla Bot';
         }
-      } catch (e) { console.error('loadUser:', e); }
+      } catch (e) { console.warn('loadUser:', e); }
     }
 
-    function showRegBanner() {
+    function showBanner() {
       if (document.getElementById('reg-banner')) return;
       const b = document.createElement('div');
       b.id = 'reg-banner';
-      b.style.cssText = 'position:fixed;top:58px;left:0;right:0;background:#FEF3C7;border-bottom:2px solid #FCD34D;padding:10px 16px;display:flex;align-items:center;gap:10px;z-index:200;font-size:13px;font-weight:600;color:#92400E';
-      b.innerHTML = `
-        <span>⚠️</span>
-        <span style="flex:1">Avval botda ro'yxatdan o'ting!</span>
-        <button onclick="window.Telegram?.WebApp?.close()" style="background:#F59E0B;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">Botga qaytish</button>
-      `;
+      b.style.cssText = 'position:fixed;top:54px;left:0;right:0;background:#FEF3C7;border-bottom:2px solid #FCD34D;padding:9px 14px;display:flex;align-items:center;gap:9px;z-index:200;font-size:13px;font-weight:600;color:#92400E';
+      b.innerHTML = '<span>⚠️</span><span style="flex:1">Avval botda ro\'yxatdan o\'ting!</span><button onclick="if(tg)tg.close()" style="background:#F59E0B;color:#fff;border:none;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer">Botga qaytish</button>';
       document.body.appendChild(b);
     }
 
-    // ══ GPS ═══════════════════════════════════════════════════════
+    // ═══ GPS ══════════════════════════════════════════════════════
     function startGPS() {
-      if (!navigator.geolocation) { setGPS('err', 'GPS qo\'llab-quvvatlanmaydi'); return; }
-      setGPS('wait', 'Aniqlanmoqda...');
+      if (!navigator.geolocation) { setGPS('er', 'GPS yo\'q'); return; }
+      setGPS('w', 'Aniqlanmoqda...');
       navigator.geolocation.getCurrentPosition(
-        pos => {
-          myLat = pos.coords.latitude; myLng = pos.coords.longitude;
-          setGPS('ok', `${myLat.toFixed(5)}, ${myLng.toFixed(5)}`);
+        function (p) {
+          myLat = p.coords.latitude; myLng = p.coords.longitude;
+          setGPS('ok', myLat.toFixed(5) + ', ' + myLng.toFixed(5));
           document.getElementById('gps-sub').textContent = '✅ Aniqlandi';
-          updateLocServer();
-          if (myMap) try { myMap.setCenter([myLat, myLng], 15); } catch (e) { }
-          updateImpact();
+          updateLoc();
+          if (myMap) { try { myMap.setCenter([myLat, myLng], 15); } catch (e) { } }
         },
-        () => { setGPS('err', 'Topilmadi — bosib qayta urining'); },
+        function () { setGPS('er', 'Topilmadi — bosing'); },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
       );
     }
-
     function retryGPS() { startGPS(); }
-
-    function setGPS(state, txt) {
+    function setGPS(s, t) {
       const dot = document.getElementById('gps-dot');
-      const label = document.getElementById('gps-txt');
-      dot.className = 'gps-dot ' + state;
-      label.textContent = txt;
+      const lbl = document.getElementById('gps-txt');
+      dot.className = 'gps-dot ' + s;
+      lbl.textContent = t;
     }
-
-    function updateLocServer() {
+    function updateLoc() {
       if (!CHAT_ID || !myLat) return;
-      fetch(`${API}/api/user/location`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: CHAT_ID, lat: myLat, lng: myLng }) }).catch(() => { });
+      fetch(API + '/api/user/location', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: CHAT_ID, lat: myLat, lng: myLng }) }).catch(function () { });
     }
 
-    // ══ MAP ═══════════════════════════════════════════════════════
-    const CAT_PRESET = {
-      muammo: 'islands#redDotIcon',
-      narkotik: 'islands#darkblueDotIcon',
-      kasal: 'islands#blueDotIcon',
-      axlat: 'islands#greenDotIcon',
-      jinoyat: 'islands#orangeDotIcon',
-      boshqa: 'islands#violetDotIcon'
-    };
+    // ═══ MAP ══════════════════════════════════════════════════════
+    const CAT_PRESET = { muammo: 'islands#redDotIcon', narkotik: 'islands#darkblueDotIcon', kasal: 'islands#blueDotIcon', axlat: 'islands#greenDotIcon', jinoyat: 'islands#orangeDotIcon', boshqa: 'islands#violetDotIcon' };
+    const CAT_LBL = { muammo: '🔴 Muammo', narkotik: '🚨 Narkotik', kasal: '🏥 Kasal', axlat: '🗑️ Axlat', jinoyat: '⚠️ Jinoyat', boshqa: '💬 Boshqa' };
+    const CAT_CLR = { muammo: '#EF4444', narkotik: '#374151', kasal: '#3B82F6', axlat: '#22C55E', jinoyat: '#F59E0B', boshqa: '#8B5CF6' };
+    const ROLE_LBL = { rais: 'Mahalla raisi', inspektor: 'Inspektor', aholi: 'Aholi' };
+
+    function loadMap() {
+      if (typeof ymaps === 'undefined') {
+        // ymaps yo'q — kutamiz
+        var tries = 0;
+        var t = setInterval(function () {
+          tries++;
+          if (typeof ymaps !== 'undefined') { clearInterval(t); initMap(); }
+          else if (tries > 20) { clearInterval(t); showMapError(); }
+        }, 300);
+      } else {
+        initMap();
+      }
+    }
+
+    function showMapError() {
+      document.getElementById('ymap').innerHTML = '<div class="map-no"><div style="font-size:36px">🗺️</div><div style="font-size:13px">Xarita kaliti kerak</div></div>';
+    }
 
     function initMap() {
-      if (typeof ymaps === 'undefined') return;
-      const center = (myLat && myLng) ? [myLat, myLng] : [41.2995, 69.2401];
+      var center = myLat ? [myLat, myLng] : [41.2995, 69.2401];
       try {
-        ymaps.ready(() => {
+        ymaps.ready(function () {
           try {
-            myMap = new ymaps.Map('ymap', {
-              center, zoom: 15,
-              controls: ['zoomControl', 'geolocationControl']
-            }, { suppressMapOpenBlock: true });
-          } catch (e) {
-            console.warn('Xarita yaratishda xato:', e);
-            document.getElementById('ymap').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#64748B;gap:8px"><div style="font-size:36px">🗺️</div><div style="font-size:14px">Xarita kaliti kerak</div></div>';
-          }
+            myMap = new ymaps.Map('ymap', { center: center, zoom: 15, controls: ['zoomControl', 'geolocationControl'] }, { suppressMapOpenBlock: true });
+          } catch (e) { showMapError(); }
         });
-      } catch (e) { console.warn('ymaps.ready xato:', e); }
+      } catch (e) { showMapError(); }
     }
 
     function centerMap() {
       if (!myMap) return;
-      if (myLat && myLng) myMap.setCenter([myLat, myLng], 15);
+      if (myLat) myMap.setCenter([myLat, myLng], 15);
       else { startGPS(); toast('📍 GPS aniqlanmoqda...'); }
     }
 
     function renderMapPosts(posts) {
       if (!myMap) return;
-      ymaps.ready(() => {
-        try { myMap.geoObjects.removeAll(); } catch (e) { }
-        // O'z belgisi
-        if (myLat && myLng) {
-          myMap.geoObjects.add(new ymaps.Placemark([myLat, myLng],
-            { balloonContent: `<b>${TGU?.first_name || 'Men'}</b><br>Siz bu yerdasiz` },
-            { preset: 'islands#blueCircleDotIcon' }
-          ));
-        }
-        posts.forEach(p => {
-          if (!p.lat || !p.lng) return;
-          try {
-            const mark = new ymaps.Placemark([p.lat, p.lng], {
-              balloonContentHeader: CAT_LABELS[p.type] || p.type,
-              balloonContentBody: `${esc(p.description)}<br><small>👤 ${esc(p.full_name)}</small>${p.photo_path ? `<br><img src="${p.photo_path}" style="width:180px;border-radius:8px;margin-top:6px">` : ''}`,
-              balloonContentFooter: fmtDate(p.created_at)
-            }, {
-              preset: CAT_PRESET[p.type] || 'islands#grayDotIcon'
-            });
-            myMap.geoObjects.add(mark);
-          } catch (e) { }
-        });
-      });
-    }
-
-    // ══ POSTS / LENTA ════════════════════════════════════════════
-    const CAT_LABELS = { muammo: '🔴 Muammo', narkotik: '🚨 Narkotik', kasal: '🏥 Kasal', axlat: '🗑️ Axlat', jinoyat: '⚠️ Jinoyat', boshqa: '💬 Boshqa' };
-    const CAT_COLORS = { muammo: '#EF4444', narkotik: '#374151', kasal: '#3B82F6', axlat: '#22C55E', jinoyat: '#F59E0B', boshqa: '#8B5CF6' };
-    const ROLE_LBL = { rais: 'Mahalla raisi', inspektor: 'Inspektor', aholi: 'Aholi' };
-
-    async function loadPosts() {
       try {
-        let url = myUser?.mahalla_id
-          ? `${API}/api/posts?mahalla_id=${myUser.mahalla_id}`
-          : myLat ? `${API}/api/posts?lat=${myLat}&lng=${myLng}` : null;
-        if (!url) return;
-        allPosts = await (await fetch(url)).json();
-        renderFeed(filteredPosts());
-        renderMapPosts(allPosts);
-        const pend = allPosts.filter(p => p.type === 'muammo' && !p.resolved).length;
-        document.getElementById('hdr-pill').textContent = pend ? `${pend} muammo` : '✅ Tinch';
-        document.getElementById('hdr-pill').style.background = pend ? '#FEE2E2' : '#D1FAE5';
-        document.getElementById('hdr-pill').style.color = pend ? '#DC2626' : '#065F46';
+        ymaps.ready(function () {
+          try { myMap.geoObjects.removeAll(); } catch (e) { }
+          if (myLat) {
+            myMap.geoObjects.add(new ymaps.Placemark([myLat, myLng], { balloonContent: '<b>Men</b>' }, { preset: 'islands#blueCircleDotIcon' }));
+          }
+          posts.forEach(function (p) {
+            if (!p.lat || !p.lng) return;
+            try {
+              myMap.geoObjects.add(new ymaps.Placemark([p.lat, p.lng], {
+                balloonContentHeader: CAT_LBL[p.type] || p.type,
+                balloonContentBody: esc(p.description) + '<br><small>👤 ' + esc(p.full_name) + '</small>',
+                balloonContentFooter: fmtDate(p.created_at)
+              }, { preset: CAT_PRESET[p.type] || 'islands#grayDotIcon' }));
+            } catch (e) { }
+          });
+        });
       } catch (e) { }
     }
 
+    // ═══ POSTS ════════════════════════════════════════════════════
+    async function loadPosts() {
+      try {
+        var url;
+        if (myUser && myUser.mahalla_id) url = API + '/api/posts?mahalla_id=' + myUser.mahalla_id;
+        else if (myLat) url = API + '/api/posts?lat=' + myLat + '&lng=' + myLng;
+        else return;
+        var r = await fetch(url);
+        if (!r.ok) return;
+        allPosts = await r.json();
+        if (!Array.isArray(allPosts)) allPosts = [];
+        renderFeed(filteredPosts());
+        renderMapPosts(allPosts);
+        var pend = allPosts.filter(function (p) { return p.type === 'muammo' && !p.resolved; }).length;
+        document.getElementById('hdr-bdg').textContent = pend ? pend + ' muammo' : '✅ Tinch';
+        document.getElementById('hdr-bdg').style.background = pend ? '#FEE2E2' : '#D1FAE5';
+        document.getElementById('hdr-bdg').style.color = pend ? '#DC2626' : '#065F46';
+      } catch (e) { console.warn('loadPosts:', e); }
+    }
+
     function filteredPosts() {
-      if (activeFilter === 'all') return allPosts;
-      return allPosts.filter(p => p.type === activeFilter);
+      if (activeF === 'all') return allPosts;
+      return allPosts.filter(function (p) { return p.type === activeF; });
     }
 
     function setFilter(btn) {
-      document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('on'));
+      document.querySelectorAll('.fbtn').forEach(function (b) { b.classList.remove('on'); });
       btn.classList.add('on');
-      activeFilter = btn.dataset.f;
+      activeF = btn.dataset.f;
       renderFeed(filteredPosts());
     }
 
     function renderFeed(posts) {
-      const el = document.getElementById('feed-list');
-      if (!posts.length) {
-        el.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div>Hozircha yangilik yo\'q</div></div>';
+      var el = document.getElementById('feed-list');
+      if (!posts || !posts.length) {
+        el.innerHTML = '<div class="empty"><div class="ei">📭</div><div>Hozircha yo\'q</div></div>';
         return;
       }
-      el.innerHTML = posts.map(p => `
-    <div class="post-card">
-      <div class="post-cat-bar" style="background:${CAT_COLORS[p.type] || '#94A3B8'}"></div>
-      <div class="post-body">
-        <div class="post-badge badge-${p.type}">${CAT_LABELS[p.type] || p.type}</div>
-        <div class="post-desc">${esc(p.description)}</div>
-        ${p.photo_path ? `<img class="post-img-thumb" src="${p.photo_path}" loading="lazy">` : ''}
-        <div class="post-footer">
-          <div class="post-author">👤 ${esc(p.full_name)}</div>
-          <span class="post-role pr-${p.role}">${ROLE_LBL[p.role] || p.role}</span>
-          <button class="btn-like" onclick="likePost(${p.id},this)">❤️ ${p.likes}</button>
-          ${p.type === 'muammo' && !p.resolved && myUser?.role !== 'aholi' ? `<button class="btn-hal" onclick="resolvePost(${p.id})">✅ Hal</button>` : ''}
-          ${p.resolved ? '<span class="resolved-badge">✅ Hal qilindi</span>' : ''}
-        </div>
-      </div>
-    </div>`).join('');
+      el.innerHTML = posts.map(function (p) {
+        return '<div class="pcard">' +
+          '<div class="pbar" style="background:' + (CAT_CLR[p.type] || '#94A3B8') + '"></div>' +
+          '<div class="pbody">' +
+          '<div class="pbadge b-' + (p.type || 'boshqa') + '">' + (CAT_LBL[p.type] || p.type) + '</div>' +
+          '<div class="pdesc">' + esc(p.description) + '</div>' +
+          (p.photo_path ? '<img class="pimg" src="' + p.photo_path + '" loading="lazy">' : '') +
+          '<div class="pfoot">' +
+          '<div class="pauth">👤 ' + esc(p.full_name) + '</div>' +
+          '<span class="prole pr-' + (p.role || 'aholi') + '">' + (ROLE_LBL[p.role] || p.role) + '</span>' +
+          '<button class="btnlike" onclick="likePost(' + p.id + ',this)">❤️ ' + p.likes + '</button>' +
+          (p.type === 'muammo' && !p.resolved && myUser && myUser.role !== 'aholi' ? '<button class="btnhal" onclick="resolvePost(' + p.id + ')">✅ Hal</button>' : '') +
+          (p.resolved ? '<span class="res-tag">✅ Hal qilindi</span>' : '') +
+          '</div>' +
+          '</div>' +
+          '</div>';
+      }).join('');
     }
 
     async function likePost(id, btn) {
       if (!CHAT_ID) return toast('⚠️ Telegram orqali kiring');
-      btn.classList.add('liked');
-      await fetch(`${API}/api/posts/${id}/like`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: CHAT_ID }) }).catch(() => { });
+      btn.classList.add('on');
+      await fetch(API + '/api/posts/' + id + '/like', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: CHAT_ID }) }).catch(function () { });
       loadPosts();
     }
-
     async function resolvePost(id) {
-      await fetch(`${API}/api/posts/${id}/resolve`, { method: 'POST' });
+      await fetch(API + '/api/posts/' + id + '/resolve', { method: 'POST' });
       toast('✅ Hal qilindi!'); loadPosts();
     }
 
-    // ══ SIGNAL FORM ═══════════════════════════════════════════════
+    // ═══ SIGNAL ═══════════════════════════════════════════════════
     function selCat(btn) {
-      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('sel'));
-      btn.classList.add('sel');
+      document.querySelectorAll('.catbtn').forEach(function (b) { b.classList.remove('on'); });
+      btn.classList.add('on');
       postType = btn.dataset.t;
-      updateImpact();
     }
-
-    function openCam() { document.getElementById('photo-cam').click(); }
-    function openGallery() { document.getElementById('photo-gal').click(); }
-
     function onPhoto(inp) {
-      const f = inp.files[0]; if (!f) return;
+      var f = inp.files[0]; if (!f) return;
       photoFile = f;
-      const r = new FileReader();
-      r.onload = e => {
-        document.getElementById('preview-img').src = e.target.result;
-        document.getElementById('preview-wrap').style.display = 'block';
+      var r = new FileReader();
+      r.onload = function (e) {
+        document.getElementById('prev-img').src = e.target.result;
+        document.getElementById('prev-wrap').style.display = 'block';
         document.getElementById('photo-btns').style.display = 'none';
-        updateImpact();
       };
       r.readAsDataURL(f);
     }
-
     function rmPhoto() {
       photoFile = null;
-      document.getElementById('preview-wrap').style.display = 'none';
+      document.getElementById('prev-wrap').style.display = 'none';
       document.getElementById('photo-btns').style.display = 'grid';
-      document.getElementById('photo-cam').value = '';
-      document.getElementById('photo-gal').value = '';
-      updateImpact();
+      document.getElementById('pic-cam').value = '';
+      document.getElementById('pic-gal').value = '';
     }
-
-    function updateImpact() {
-      let score = 0;
-      const desc = document.getElementById('post-desc')?.value || '';
-      if (myLat) score += 30;
-      if (photoFile) score += 40;
-      if (desc.length > 10) score += 20;
-      if (desc.length > 50) score += 10;
-      document.getElementById('impact-val').textContent = Math.min(score, 100) + '%';
-    }
-
     async function submitPost() {
       if (!CHAT_ID) return toast('⚠️ Telegram orqali kiring!');
-      if (!myUser) return toast('⚠️ Avval ro\'yxatdan o\'ting');
-      const desc = document.getElementById('post-desc').value.trim();
+      if (!myUser) return toast('⚠️ Avval botda ro\'yxatdan o\'ting');
+      var desc = document.getElementById('sdesc').value.trim();
       if (!desc) return toast('⚠️ Izoh yozing!');
       if (!myLat || !myLng) return toast('⚠️ GPS topilmadi! Joylashuv qatorini bosing');
-      const btn = document.getElementById('post-btn');
+      var btn = document.getElementById('sbtn');
       btn.disabled = true; btn.textContent = '⏳ Yuborilmoqda...';
       try {
-        const fd = new FormData();
+        var fd = new FormData();
         fd.append('chat_id', CHAT_ID);
         fd.append('type', postType);
         fd.append('description', desc);
         fd.append('lat', myLat); fd.append('lng', myLng);
         if (photoFile) fd.append('photo', photoFile);
-        const r = await fetch(`${API}/api/posts`, { method: 'POST', body: fd });
-        const d = await r.json();
+        var r = await fetch(API + '/api/posts', { method: 'POST', body: fd });
+        var d = await r.json();
         if (d.ok) {
           toast('✅ Signal yuborildi! +5 ball');
-          document.getElementById('post-desc').value = '';
-          rmPhoto();
-          loadPosts();
-          goTab('lenta');
+          document.getElementById('sdesc').value = '';
+          rmPhoto(); loadPosts(); goTab('lenta');
         } else toast('❌ ' + (d.error || 'Xato'));
-      } catch (e) { toast('❌ Server xatosi'); }
-      finally { btn.disabled = false; btn.innerHTML = '➤ Signal yuborish'; }
+      } catch (e) { toast('❌ Server xatosi: ' + e.message); }
+      finally { btn.disabled = false; btn.textContent = '➤ Signal yuborish'; }
     }
 
-    // ══ CHAT ══════════════════════════════════════════════════════
+    // ═══ CHAT ═════════════════════════════════════════════════════
     async function loadChatList() {
-      const el = document.getElementById('chat-list-body');
-      el.innerHTML = '';
-      const members = myUser?.mahalla_id
-        ? await fetch(`${API}/api/mahalla/members?mahalla_id=${myUser.mahalla_id}`).then(r => r.json()).catch(() => [])
-        : [];
-
-      // Guruh
-      const g = document.createElement('div');
-      g.className = 'chat-item';
-      g.innerHTML = `<div class="chat-av ca-group">🏘️</div><div class="chat-meta"><div class="chat-name2">Mahalla guruhi</div><div class="chat-last2">${members.length} a'zo — umumiy chat</div></div>`;
-      g.onclick = () => openChatRoom('group', null, '🏘️ Mahalla guruhi', members.length + " a'zo");
-      el.appendChild(g);
-
-      // Kontaktlar va a'zolar
-      if (CHAT_ID && myUser) {
-        const contacts = await fetch(`${API}/api/messages/contacts?chat_id=${CHAT_ID}`).then(r => r.json()).catch(() => []);
-        const shownIds = new Set(contacts.map(c => c.contact_id));
-        const allContacts = [...contacts, ...members.filter(m => m.id !== myUser.id && !shownIds.has(m.id)).map(m => ({ ...m, contact_id: m.id }))];
-        allContacts.forEach(c => {
-          const item = document.createElement('div');
-          item.className = 'chat-item';
-          item.innerHTML = `<div class="chat-av ca-user">${(c.full_name || '?')[0].toUpperCase()}</div><div class="chat-meta"><div class="chat-name2">${esc(c.full_name || 'Noma\'lum')}</div><div class="chat-last2">${ROLE_LBL[c.role] || c.role || ''}</div></div>${c.last_time ? `<div class="chat-time2">${fmtTime(c.last_time)}</div>` : ''}`;
-          item.onclick = () => openChatRoom('private', c.contact_id || c.id, c.full_name, ROLE_LBL[c.role] || '');
-          el.appendChild(item);
-        });
+      var el = document.getElementById('clist'); el.innerHTML = '';
+      var members = [];
+      if (myUser && myUser.mahalla_id) {
+        try { var r = await fetch(API + '/api/mahalla/members?mahalla_id=' + myUser.mahalla_id); if (r.ok) members = await r.json(); } catch (e) { }
       }
-
-      if (el.children.length === 0) {
-        el.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><div>Mahallangizda hali a\'zo yo\'q</div></div>';
+      var g = document.createElement('div'); g.className = 'citem';
+      g.innerHTML = '<div class="cav cav-g">🏘️</div><div class="cmeta"><div class="cname">Mahalla guruhi</div><div class="clast">' + members.length + " a'zo — umumiy chat</div></div>";
+      g.onclick = function () { openRoom('group', null, '🏘️ Mahalla guruhi', members.length + " a'zo"); };
+      el.appendChild(g);
+      if (CHAT_ID && myUser) {
+        try {
+          var cr = await fetch(API + '/api/messages/contacts?chat_id=' + CHAT_ID);
+          var contacts = cr.ok ? await cr.json() : [];
+          var shownIds = new Set(contacts.map(function (c) { return c.contact_id; }));
+          var all2 = contacts.concat(members.filter(function (m) { return m.id !== myUser.id && !shownIds.has(m.id); }));
+          all2.forEach(function (c) {
+            var item = document.createElement('div'); item.className = 'citem';
+            item.innerHTML = '<div class="cav cav-u">' + (c.full_name || '?')[0].toUpperCase() + '</div>' +
+              '<div class="cmeta"><div class="cname">' + esc(c.full_name || 'Noma\'lum') + '</div>' +
+              '<div class="clast">' + (ROLE_LBL[c.role] || c.role || '') + '</div></div>' +
+              (c.last_time ? '<div class="ctime">' + fmtTime(c.last_time) + '</div>' : '');
+            var cid2 = c.contact_id || c.id;
+            item.onclick = function () { openRoom('private', cid2, c.full_name, ROLE_LBL[c.role] || ''); };
+            el.appendChild(item);
+          });
+        } catch (e) { }
       }
     }
 
-    function openChatRoom(mode, contactId, name, sub) {
-      chatMode = mode; chatContactId = contactId;
-      document.getElementById('room-name').textContent = name;
-      document.getElementById('room-sub').textContent = sub || '';
-      document.getElementById('chat-list-wrap').classList.add('hide');
-      document.getElementById('chat-room-wrap').classList.add('on');
+    function openRoom(mode, cid, name, sub) {
+      chatMode = mode; chatCid = cid;
+      document.getElementById('crname').textContent = name;
+      document.getElementById('crsub').textContent = sub || '';
+      document.getElementById('clist-wrap').classList.add('hide');
+      document.getElementById('croom-wrap').classList.add('on');
       loadMsgs();
       clearInterval(chatPoll);
       chatPoll = setInterval(loadMsgs, 2500);
     }
-
     function backToList() {
       clearInterval(chatPoll);
-      document.getElementById('chat-room-wrap').classList.remove('on');
-      document.getElementById('chat-list-wrap').classList.remove('hide');
+      document.getElementById('croom-wrap').classList.remove('on');
+      document.getElementById('clist-wrap').classList.remove('hide');
     }
-
     async function loadMsgs() {
       if (!myUser) return;
-      let msgs = [];
       try {
-        if (chatMode === 'group') {
-          const r = await fetch(`${API}/api/messages/group?mahalla_id=${myUser.mahalla_id}`);
-          if (r.ok) msgs = await r.json();
-        } else {
-          const r = await fetch(`${API}/api/messages/private?chat_id=${CHAT_ID}&contact_id=${chatContactId}`);
-          if (r.ok) msgs = await r.json();
-        }
-      } catch (e) { return; }
-      const wrap = document.getElementById('msgs-wrap');
-      const atBot = wrap.scrollHeight - wrap.scrollTop - wrap.clientHeight < 80;
-      if (!Array.isArray(msgs)) return;
-      wrap.innerHTML = msgs.map(m => {
-        const mine = m.from_user_id === myUser?.id;
-        return `<div class="msg-b ${mine ? 'msg-out' : 'msg-in'}">
-      ${!mine && chatMode === 'group' ? `<div class="msg-sndr">${esc(m.full_name || '')}</div>` : ''}
-      ${esc(m.text || '')}
-      <div class="msg-t">${fmtTime(m.created_at)}</div>
-    </div>`;
-      }).join('');
-      if (atBot || msgs.length < 4) wrap.scrollTop = wrap.scrollHeight;
+        var r;
+        if (chatMode === 'group') r = await fetch(API + '/api/messages/group?mahalla_id=' + myUser.mahalla_id);
+        else r = await fetch(API + '/api/messages/private?chat_id=' + CHAT_ID + '&contact_id=' + chatCid);
+        if (!r.ok) return;
+        var msgs = await r.json();
+        if (!Array.isArray(msgs)) return;
+        var wrap = document.getElementById('msgs');
+        var atBot = wrap.scrollHeight - wrap.scrollTop - wrap.clientHeight < 80;
+        wrap.innerHTML = msgs.map(function (m) {
+          var mine = m.from_user_id === myUser.id;
+          return '<div class="mb ' + (mine ? 'mb-out' : 'mb-in') + '">' +
+            (!mine && chatMode === 'group' ? '<div class="msndr">' + esc(m.full_name || '') + '</div>' : '') +
+            esc(m.text || '') +
+            '<div class="mt">' + fmtTime(m.created_at) + '</div>' +
+            '</div>';
+        }).join('');
+        if (atBot) wrap.scrollTop = wrap.scrollHeight;
+      } catch (e) { }
     }
-
     async function sendMsg() {
-      const inp = document.getElementById('msg-inp');
-      const text = inp.value.trim();
+      var inp = document.getElementById('minput');
+      var text = inp.value.trim();
       if (!text) return;
       if (!CHAT_ID) return toast('⚠️ Telegram orqali kiring');
       if (!myUser) return toast('⚠️ Avval ro\'yxatdan o\'ting');
       inp.value = '';
       try {
         if (chatMode === 'group') {
-          await fetch(`${API}/api/messages/group`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: CHAT_ID, text })
-          });
+          await fetch(API + '/api/messages/group', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: CHAT_ID, text: text }) });
         } else {
-          await fetch(`${API}/api/messages/private`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: CHAT_ID, to_user_id: chatContactId, text })
-          });
+          await fetch(API + '/api/messages/private', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: CHAT_ID, to_user_id: chatCid, text: text }) });
         }
-        await loadMsgs();
+        loadMsgs();
       } catch (e) { toast('❌ Xabar ketmadi'); }
     }
 
-    // ══ TAHLIL ════════════════════════════════════════════════════
+    // ═══ TAHLIL ═══════════════════════════════════════════════════
     async function loadStats() {
-      if (!myUser?.mahalla_id) return;
+      if (!myUser || !myUser.mahalla_id) return;
       try {
-        const d = await (await fetch(`${API}/api/stats?mahalla_id=${myUser.mahalla_id}`)).json();
-        const members = await (await fetch(`${API}/api/mahalla/members?mahalla_id=${myUser.mahalla_id}`)).json().catch(() => []);
-        document.getElementById('s-total').textContent = d.total || 0;
-        document.getElementById('s-pend').textContent = d.pending || 0;
-        document.getElementById('s-res').textContent = d.resolved || 0;
-        document.getElementById('s-mem').textContent = members.length || 0;
-        document.getElementById('my-score').textContent = myUser.score || 0;
-        const rank = d.top_users?.findIndex(u => u.full_name === myUser.full_name);
-        document.getElementById('my-rank').textContent = rank >= 0 ? `Mahallada ${rank + 1}-o'rin` : "Hali reyting yo'q";
-
-        // Kategoriyalar statistika
-        const cats = ['muammo', 'narkotik', 'kasal', 'axlat', 'jinoyat', 'boshqa'];
-        const catCounts = {};
-        allPosts.forEach(p => { catCounts[p.type] = (catCounts[p.type] || 0) + 1; });
-        const maxC = Math.max(1, ...Object.values(catCounts));
-        document.getElementById('cat-stats').innerHTML = cats.map(c => `
-      <div class="cs-row">
-        <div class="cs-icon">${CAT_LABELS[c]?.split(' ')[0] || '📌'}</div>
-        <div class="cs-label">${CAT_LABELS[c]?.split(' ').slice(1).join(' ') || c}</div>
-        <div class="cs-bar-wrap"><div class="cs-bar" style="width:${Math.round(((catCounts[c] || 0) / maxC) * 100)}%;background:${CAT_COLORS[c]}"></div></div>
-        <div class="cs-count">${catCounts[c] || 0}</div>
-      </div>`).join('');
-
+        var r = await fetch(API + '/api/stats?mahalla_id=' + myUser.mahalla_id);
+        if (!r.ok) return;
+        var d = await r.json();
+        var mr = await fetch(API + '/api/mahalla/members?mahalla_id=' + myUser.mahalla_id);
+        var members = mr.ok ? await mr.json() : [];
+        document.getElementById('t-total').textContent = d.total || 0;
+        document.getElementById('t-pend').textContent = d.pending || 0;
+        document.getElementById('t-res').textContent = d.resolved || 0;
+        document.getElementById('t-toy').textContent = d.toy || 0;
+        document.getElementById('t-mem').textContent = members.length || 0;
+        document.getElementById('t-score').textContent = myUser.score || 0;
+        var rank = d.top_users ? d.top_users.findIndex(function (u) { return u.full_name === myUser.full_name; }) : -1;
+        document.getElementById('t-rank').textContent = rank >= 0 ? (rank + 1) + '-o\'rin' : "Hali yo'q";
+        // Kategoriya stats
+        var cats = ['muammo', 'narkotik', 'kasal', 'axlat', 'jinoyat', 'boshqa'];
+        var cc = {};
+        allPosts.forEach(function (p) { cc[p.type] = (cc[p.type] || 0) + 1; });
+        var maxC = Math.max(1, Math.max.apply(null, Object.values(cc).concat([0])));
+        document.getElementById('catstats').innerHTML = cats.map(function (c) {
+          return '<div class="csr"><div class="csico">' + (CAT_LBL[c] || '📌').split(' ')[0] + '</div>' +
+            '<div class="cslbl">' + (CAT_LBL[c] || c).split(' ').slice(1).join(' ') + '</div>' +
+            '<div class="csbw"><div class="csb" style="width:' + Math.round(((cc[c] || 0) / maxC) * 100) + '%;background:' + (CAT_CLR[c] || '#94A3B8') + '"></div></div>' +
+            '<div class="cscnt">' + (cc[c] || 0) + '</div></div>';
+        }).join('');
         // Reyting
-        const rc = ['lb-1', 'lb-2', 'lb-3'];
-        document.getElementById('leaderboard').innerHTML = d.top_users?.length
-          ? d.top_users.map((u, i) => `
-        <div class="lb-item">
-          <div class="lb-badge ${rc[i] || 'lb-n'}">${i + 1}</div>
-          <div class="lb-name2">${esc(u.full_name)} <span style="font-size:11px;color:var(--text2)">(${u.role || ''})</span></div>
-          <div class="lb-score2">⭐ ${u.score}</div>
-        </div>`).join('')
-          : '<div class="empty"><div class="empty-icon">🌟</div><div>Hali hech kim yo\'q</div></div>';
-      } catch (e) { }
+        var rc = ['lb1', 'lb2', 'lb3'];
+        document.getElementById('lb').innerHTML = d.top_users && d.top_users.length
+          ? d.top_users.map(function (u, i) {
+            return '<div class="lb-item"><div class="lbn ' + (rc[i] || '') + '">' + (i + 1) + '</div>' +
+              '<div class="lbname">' + esc(u.full_name) + '</div>' +
+              '<div class="lbsc">⭐ ' + u.score + '</div></div>';
+          }).join('')
+          : '<div class="empty"><div class="ei">🌟</div><div>Hali hech kim yo\'q</div></div>';
+      } catch (e) { console.warn('loadStats:', e); }
     }
 
-    // ══ TABS ══════════════════════════════════════════════════════
-    const TABS = ['map', 'lenta', 'signal', 'chat', 'tahlil'];
+    // ═══ TABS ═════════════════════════════════════════════════════
+    var TABS = ['map', 'lenta', 'signal', 'chat', 'tahlil'];
     function goTab(name) {
       curTab = name;
-      TABS.forEach(t => {
-        const el = document.getElementById('tab-' + t);
-        const btn = document.getElementById('n-' + t);
+      TABS.forEach(function (t) {
+        var el = document.getElementById('tab-' + t);
+        var btn = document.getElementById('n-' + t);
         if (el) el.classList.toggle('on', t === name);
         if (btn) btn.classList.toggle('on', t === name);
       });
-      // Signal tugmasi har doim o'z rangida
-      document.getElementById('n-signal').classList.remove('on');
-      if (name === 'signal') document.getElementById('n-signal').style.opacity = '1';
-
-      if (name === 'tahlil') { loadStats(); }
+      if (name === 'tahlil') loadStats();
       if (name === 'chat') { loadChatList(); backToList(); }
-      if (name === 'lenta') { loadPosts(); }
-      if (name === 'map') { loadPosts(); }
+      if (name === 'lenta' || name === 'map') loadPosts();
     }
 
-    // ══ UTILS ═════════════════════════════════════════════════════
-    function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on'); setTimeout(() => t.classList.remove('on'), 3000); }
-    function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
+    // ═══ UTILS ════════════════════════════════════════════════════
+    function toast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on'); setTimeout(function () { t.classList.remove('on'); }, 3000); }
+    function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
     function fmtDate(d) { if (!d) return ''; return new Date(d).toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); }
-    function fmtTime(d) { if (!d) return ''; const t = new Date(d), now = new Date(); return t.toDateString() === now.toDateString() ? t.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }) : t.toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit' }); }
+    function fmtTime(d) { if (!d) return ''; var t = new Date(d), n = new Date(); return t.toDateString() === n.toDateString() ? t.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }) : t.toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit' }); }
   </script>
-</body>
 
+  <!-- Yandex Maps — OXIRIDA yuklanadi, dasturni bloklamaydi -->
+  <script src="https://api-maps.yandex.ru/2.1/?lang=uz_UZ&apikey=6e799f0e-abd1-4c51-a0ad-29fc1ecb3845
+</body>
 </html>
