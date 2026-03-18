@@ -69,6 +69,19 @@
       }
     }
 
+    @keyframes fadeout {
+      0% {
+        opacity: 1;
+        pointer-events: all
+      }
+
+      100% {
+        opacity: 0;
+        pointer-events: none;
+        display: none
+      }
+    }
+
     #loading p {
       color: rgba(255, 255, 255, .8);
       font-size: 13px
@@ -1221,7 +1234,7 @@
 
 <body>
 
-  <div id="loading">
+  <div id="loading" style="animation:fadeout 0.8s 1s forwards">
     <div style="font-size:48px">🏘️</div>
     <div class="spin"></div>
     <p>Mahalla Bot yuklanmoqda...</p>
@@ -1517,31 +1530,45 @@
       }
     } catch (e) { console.warn('CHAT_ID xato:', e); }
 
-    console.log('FINAL CHAT_ID:', CHAT_ID, 'URL:', window.location.href);
-    let ser = null;
+    console.log('FINAL CHAT_ID:', CHAT_ID, 'URL:', window.location.href); ser = null;
     let myMap = null, postType = 'muammo', photoFile = null;
     let curTab = 'map', chatMode = 'group', chatContactId = null;
     let chatPoll = null, allPosts = [], activeFilter = 'all';
 
     // ══ INIT ══════════════════════════════════════════════════════
     window.addEventListener('load', async () => {
-      // Loading ekranini 3 soniyadan keyin majburiy yashirish
-      setTimeout(() => { document.getElementById('loading').style.display = 'none'; }, 3000);
+      // Loading ekranini DARHOL yashiramiz
+      const hideLoading = () => {
+        const el = document.getElementById('loading');
+        if (el) el.style.display = 'none';
+      };
 
-      await loadUser();
+      // 1 soniyadan keyin majburiy yashir
+      setTimeout(hideLoading, 1000);
+
+      // Parallel yuklaymiz
+      loadUser().finally(hideLoading);
       startGPS();
       loadPosts();
 
-      // Yandex Maps alohida yuklanadi — yuklanmasa ham dastur ishlaydi
+      // Xarita — yuklanmasa ham ishlaydi
       if (typeof ymaps !== 'undefined') {
         initMap();
       } else {
-        document.getElementById('loading').style.display = 'none';
-        // Maps o'rniga xabar
-        document.getElementById('ymap').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#64748B;gap:8px"><div style="font-size:36px">🗺️</div><div style="font-size:14px">Xarita yuklanmadi</div><div style="font-size:12px">Yandex API kaliti kerak</div></div>';
+        // ymaps kelishini kutamiz (max 3 soniya)
+        let tries = 0;
+        const waitMaps = setInterval(() => {
+          tries++;
+          if (typeof ymaps !== 'undefined') {
+            clearInterval(waitMaps);
+            initMap();
+          } else if (tries > 6) {
+            clearInterval(waitMaps);
+            const yel = document.getElementById('ymap');
+            if (yel) yel.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#64748B;gap:8px"><div style="font-size:40px">🗺️</div><div style="font-size:14px;font-weight:600">Xarita kaliti kerak</div><div style="font-size:12px">developer.tech.yandex.ru</div></div>';
+          }
+        }, 500);
       }
-
-      document.getElementById('loading').style.display = 'none';
     });
 
     // ══ USER ══════════════════════════════════════════════════════
@@ -1575,10 +1602,10 @@
       b.id = 'reg-banner';
       b.style.cssText = 'position:fixed;top:58px;left:0;right:0;background:#FEF3C7;border-bottom:2px solid #FCD34D;padding:10px 16px;display:flex;align-items:center;gap:10px;z-index:200;font-size:13px;font-weight:600;color:#92400E';
       b.innerHTML = `
-    <span>⚠️</span>
-    <span style="flex:1">Avval botda ro'yxatdan o'ting!</span>
-    <button onclick="window.Telegram?.WebApp?.close()" style="background:#F59E0B;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">Botga qaytish</button>
-  `;
+        <span>⚠️</span>
+        <span style="flex:1">Avval botda ro'yxatdan o'ting!</span>
+        <button onclick="window.Telegram?.WebApp?.close()" style="background:#F59E0B;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">Botga qaytish</button>
+      `;
       document.body.appendChild(b);
     }
 
